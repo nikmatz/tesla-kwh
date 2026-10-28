@@ -114,6 +114,9 @@ table.log td{padding:7px 8px;border-bottom:1px solid var(--line);text-align:righ
 table.log tr.rec{cursor:pointer}
 table.log tr.rec:hover td{background:var(--surface-2)}
 table.log tr.flag td{color:var(--muted)}
+table.log td.del{padding:2px 6px;width:28px}
+.xdel{border:0;background:transparent;color:var(--faint);font-size:18px;line-height:1;width:24px;height:24px;border-radius:6px;cursor:pointer}
+.xdel:hover{background:var(--danger);color:#fff}
 table.log tfoot td{font-weight:600;background:var(--surface-2);border-top:2px solid var(--line-strong)}
 table.log td.loc{text-align:left;max-width:180px;overflow:hidden;text-overflow:ellipsis}
 .tag{display:inline-block;padding:1px 7px;border-radius:999px;font-size:12px;font-weight:500;color:#fff;vertical-align:1px}
@@ -153,7 +156,7 @@ table.mini tr:last-child td{border-bottom:0}
 
 /* recent list */
 .recent{display:flex;flex-direction:column}
-.recent .row{display:grid;grid-template-columns:78px minmax(0,1fr) auto auto;gap:10px;padding:9px 0;border-bottom:1px solid var(--line);align-items:center;font-size:13.5px;cursor:pointer}
+.recent .row{display:grid;grid-template-columns:78px minmax(0,1fr) auto auto 26px;gap:10px;padding:9px 0;border-bottom:1px solid var(--line);align-items:center;font-size:13.5px;cursor:pointer}
 .recent .row:hover{background:var(--surface-2)}
 .recent .row:last-child{border-bottom:0}
 .recent .loc{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
@@ -202,7 +205,7 @@ code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12.5px;ba
   <div class="top-inner">
     <div class="brand">
       <svg viewBox="0 0 32 32" aria-hidden="true"><rect x="3" y="9" width="23" height="14" rx="3" fill="currentColor" opacity=".9"/><rect x="27" y="13" width="3" height="6" rx="1" fill="currentColor" opacity=".9"/><path d="M17 11l-6 6h4l-2 5 7-7h-4z" fill="var(--surface)"/></svg>
-      Tesla kWh <small id="carName" title="by Nik Matz"></small>
+      Tesla kWh <small id="carName" title="by nikmatz@"></small>
     </div>
     <nav class="tabs" id="tabs">
       <a href="#entry" data-view="entry">Καταχώρηση</a>
@@ -417,6 +420,7 @@ code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12.5px;ba
 
 <script>
 /* ===================== utilities ===================== */
+const APP_VERSION = '1.5 · 28/10/2026';
 const $ = (s, el=document) => el.querySelector(s);
 const $$ = (s, el=document) => [...el.querySelectorAll(s)];
 const isNum = v => typeof v === 'number' && isFinite(v);
@@ -465,7 +469,7 @@ const Store = {
   },
   queue(){ try{ return JSON.parse(LS.get('tesla-kwh-queue')||'[]'); }catch(e){ return []; } },
   enqueue(rec){ const q=this.queue(); q.push(rec); LS.set('tesla-kwh-queue', JSON.stringify(q)); setStatus('ok'); },
-  save(){ if(this.mode==='offline'){ setStatus('ok'); return; } this.dirty=true; setStatus('saving'); clearTimeout(this.saveTimer); this.saveTimer=setTimeout(()=>this.flush(),400); },
+  save(){ if(this.loadFailed){ toast('Τα δεδομένα δεν φορτώθηκαν — η αποθήκευση είναι κλειδωμένη για να μη χαθεί τίποτα. Κλείσε και άνοιξε ξανά την εφαρμογή.', true); return; } if(this.mode==='offline'){ setStatus('ok'); return; } this.dirty=true; setStatus('saving'); clearTimeout(this.saveTimer); this.saveTimer=setTimeout(()=>this.flush(),400); },
   async flush(){
     try{
       const text=JSON.stringify(stripState());
@@ -583,7 +587,7 @@ function route(){ const h=(location.hash||'#entry').slice(1); view=['entry','log
   $$('.view').forEach(v=>v.classList.toggle('active',v.id==='view-'+view));
   render(); window.scrollTo(0,0); }
 window.addEventListener('hashchange',route);
-function render(){ if(!S) return; $('#carName').textContent=(S.settings.car||'')+' · by Nik Matz';
+function render(){ if(!S) return; $('#carName').textContent=(S.settings.car||'')+' · by nikmatz@';
   if(view==='entry') renderEntry(); if(view==='log') renderLog(); if(view==='summary') renderSummary(); if(view==='import') renderImportInfo(); if(view==='settings') renderSettings(); }
 function save(){ Store.save(S); }
 function requireOnline(){ if(Store.mode==='offline'){ toast('Χωρίς σύνδεση με το Mac: αλλαγές σε υπάρχουσες εγγραφές και ρυθμίσεις γίνονται μόνο με σύνδεση. Νέες φορτίσεις μπαίνουν σε ουρά.', true); return false; } return true; }
@@ -619,7 +623,8 @@ function readForm(p, existing){
   r.pct_start=parseNum(g('p0').value); r.pct_end=parseNum(g('p1').value);
   r.kwh_charger=parseNum(g('kwh').value); r.kwh_car=parseNum(g('kwhc').value);
   r.current=$('#'+p+'cur .on')?.dataset.v||null; r.tariff=$('#'+p+'tar .on')?.dataset.v||null;
-  r.price=parseNum(g('price').value); r.cost=parseNum(g('cost').value); r.odometer=parseNum(g('odo').value); r.note=g('note').value.trim();
+  r.price=parseNum(g('price').value); r.cost=parseNum(g('cost').value);
+  if(isNum(r.cost)&&isNum(r.kwh_charger)&&r.kwh_charger>0&&g('cost').dataset.auto==='0') r.price=Math.round(r.cost/r.kwh_charger*10000)/10000; r.odometer=parseNum(g('odo').value); r.note=g('note').value.trim();
   if(r.start&&r.end){ const [h1,m1]=r.start.split(':').map(Number),[h2,m2]=r.end.split(':').map(Number); let m=(h2*60+m2)-(h1*60+m1); if(m<0) m+=1440; r.duration_min=m; }
   r.flags=(r.flags||[]).filter(f=>f!=='incomplete'&&f!=='free_credit'); if(r.pct_start==null||r.pct_end==null||r.kwh_charger==null) r.flags.push('incomplete');
   if(g('free').checked) ensureFreeLoc();
@@ -641,15 +646,17 @@ function wireForm(p){
   const recalc=()=>{ recalcCost(p); hintEff(p); };
   g('kwh').addEventListener('input',()=>{ if(!g('kwhc').value||g('kwhc').dataset.auto==='1'){ const l=locOf(g('loc').value); const k=parseNum(g('kwh').value); const ef= l? locEff(l.name) : null; if(isNum(k)){ g('kwhc').value = ($('#'+p+'cur .on')?.dataset.v==='DC'||!isNum(ef)) ? String(k) : String(Math.round(k*ef*100)/100); g('kwhc').dataset.auto='1'; } } recalc(); });
   g('kwhc').addEventListener('input',()=>{ g('kwhc').dataset.auto='0'; hintEff(p); });
-  g('price').addEventListener('input',()=>{ g('price').dataset.auto='0'; g('cost').dataset.auto='1'; recalcCost(p); });
-  g('cost').addEventListener('input',()=>{ g('cost').dataset.auto='0'; const c=parseNum(g('cost').value), k=parseNum(g('kwh').value); g('costHint').textContent = (isNum(c)&&isNum(k)&&k>0) ? `${fmt(c/k,3)} €/kWh` : ''; });
+  g('price').addEventListener('input',()=>{ g('price').dataset.auto='0'; g('cost').dataset.auto='1'; g('costHint').textContent=''; recalcCost(p); });
+  g('cost').addEventListener('input',()=>{ g('cost').dataset.auto=g('cost').value.trim()===''?'1':'0'; priceFromCost(p); });
   $$('#'+p+'cur button').forEach(b=>b.addEventListener('click',()=>{ hintEff(p); }));
 }
 function applyLocPrice(p){ const g=id=>$('#'+p+id); const l=locOf(g('loc').value); if(!l) return; if(g('price').value && g('price').dataset.auto!=='1') return; const pr=priceFor(l, $('#'+p+'tar .on')?.dataset.v||null, g('date').value||todayISO()); g('price').value = isNum(pr)&&pr>0 ? String(pr) : ''; g('price').dataset.auto='1'; }
 function setSeg(id,v){ $$('#'+id+' button').forEach(b=>b.classList.toggle('on',b.dataset.v===v)); }
 function clearSeg(id){ $$('#'+id+' button').forEach(b=>b.classList.remove('on')); }
 function locEff(name){ const rs=S.records.filter(r=>r.location===name&&isNum(r.kwh_charger)&&r.kwh_charger>1&&isNum(r.kwh_car)).slice(-12); if(rs.length<2) return null; const e=median(rs.map(r=>r.kwh_car/r.kwh_charger)); return (e>0.7&&e<=1.02)? e : null; }
-function recalcCost(p){ const g=id=>$('#'+p+id); if(g('cost').dataset.auto==='0' && g('cost').value) return; const pr=parseNum(g('price').value), k=parseNum(g('kwh').value); if(isNum(pr)&&isNum(k)){ g('cost').value=String(Math.round(pr*k*100)/100); g('cost').dataset.auto='1'; g('costHint').textContent=''; } }
+function priceFromCost(p){ const g=id=>$('#'+p+id); if(g('cost').dataset.auto!=='0'){ g('costHint').textContent=''; return; } const c=parseNum(g('cost').value), k=parseNum(g('kwh').value);
+  if(isNum(c)&&isNum(k)&&k>0){ const pr=Math.round(c/k*10000)/10000; g('price').value=String(pr); g('price').dataset.auto='1'; g('costHint').textContent=`= ${fmt(pr,3)} €/kWh`; } else g('costHint').textContent = isNum(c)? 'γράψε και Kwh real για €/kWh' : ''; }
+function recalcCost(p){ const g=id=>$('#'+p+id); if(g('cost').dataset.auto==='0' && g('cost').value){ priceFromCost(p); return; } const pr=parseNum(g('price').value), k=parseNum(g('kwh').value); if(isNum(pr)&&isNum(k)){ g('cost').value=String(Math.round(pr*k*100)/100); g('cost').dataset.auto='1'; g('costHint').textContent=''; } }
 function hintEff(p){ const g=id=>$('#'+p+id); const k=parseNum(g('kwh').value), kc=parseNum(g('kwhc').value); g('effHint').textContent = (isNum(k)&&k>0&&isNum(kc)) ? `απόδοση ${fmt(kc/k*100,1)}%` : ''; }
 
 function renderEntry(){
@@ -691,18 +698,23 @@ function addRecord(r){ const l=locOf(r.location); if(!l){ S.locations.push({name
   save(); }
 function renderRecent(){
   const rs=compute().slice(-8).reverse();
-  $('#recentList').innerHTML = rs.length? rs.map(r=>`<div class="row" data-id="${r.id}"><span class="muted">${fmtDate(r.date)}</span><span class="loc"><span class="swatch cat-${r._d.cat}"></span>${esc(r.location)}</span><span class="pct">${isNum(r.pct_start)&&isNum(r.pct_end)?`${fmt(r.pct_start,0)}→${fmt(r.pct_end,0)}%`:'<span class="faint">χωρίς στοιχεία</span>'}</span><span class="kwh">${fmt(r.kwh_charger,1)} kWh${isNum(r._d.cost)&&r._d.cost>0?` <span class="muted">· ${fmtEur(r._d.cost)}</span>`:''}</span></div>`).join('') : `<div class="empty">Καμία φόρτιση ακόμη.</div>`;
-  $$('#recentList .row').forEach(el=>el.addEventListener('click',()=>openEdit(el.dataset.id)));
+  $('#recentList').innerHTML = rs.length? rs.map(r=>`<div class="row" data-id="${r.id}"><span class="muted">${fmtDate(r.date)}</span><span class="loc"><span class="swatch cat-${r._d.cat}"></span>${esc(r.location)}</span><span class="pct">${isNum(r.pct_start)&&isNum(r.pct_end)?`${fmt(r.pct_start,0)}→${fmt(r.pct_end,0)}%`:'<span class="faint">χωρίς στοιχεία</span>'}</span><span class="kwh">${fmt(r.kwh_charger,1)} kWh${isNum(r._d.cost)&&r._d.cost>0?` <span class="muted">· ${fmtEur(r._d.cost)}</span>`:''}</span><button class="xdel" data-del="${r.id}" title="Διαγραφή">×</button></div>`).join('') : `<div class="empty">Καμία φόρτιση ακόμη.</div>`;
+  $$('#recentList .row').forEach(el=>el.addEventListener('click',ev=>{ if(ev.target.closest('.xdel')) return; openEdit(el.dataset.id); }));
+  $$('#recentList .xdel').forEach(b=>b.addEventListener('click',ev=>{ ev.stopPropagation(); deleteRecord(b.dataset.del); }));
 }
 
 /* ===================== edit dialog ===================== */
+function deleteRecord(id){ if(!requireOnline()) return false; const r=S.records.find(x=>x.id===id); if(!r) return false;
+  if(!confirm(`Διαγραφή της φόρτισης;\n${describe(r)}`)) return false;
+  if(r.teslafi_id!=null){ S.settings.teslafi_ignore=S.settings.teslafi_ignore||[]; if(!S.settings.teslafi_ignore.includes(r.teslafi_id)) S.settings.teslafi_ignore.push(r.teslafi_id); }
+  S.records=S.records.filter(x=>x.id!==id); save(); toast('Διαγράφηκε'); render(); return true; }
 function openEdit(id){
   const r=S.records.find(x=>x.id===id); if(!r) return;
   const f=$('#editForm'); f.innerHTML = formHTML(r,'d_') + `<div class="actions"><button class="btn primary" type="submit">Αποθήκευση αλλαγών</button><button class="btn danger" type="button" id="d_del">Διαγραφή</button><span class="spacer" style="flex:1"></span><span class="faint" style="font-size:12px">${r.source==='teslafi'?'από TeslaFi #'+esc(r.teslafi_id):(r.source==='sheet+teslafi'?'από το φύλλο, συμπληρωμένη από TeslaFi #'+esc(r.teslafi_id):(r.source==='sheet'?'από το φύλλο Excel'+(r.teslafi_id!=null?' · TeslaFi #'+esc(r.teslafi_id):''):'χειροκίνητη'))}${r.flags?.includes('corrected')?' · διορθωμένη':''}${r.flags?.includes('cost_estimated')?' · κόστος: εκτίμηση TeslaFi':''}${r.flags?.includes('estimated')?' · υποθετική φόρτιση (εκτίμηση)':''}</span></div>`;
   wireForm('d_'); if(isNum(r.price)) $('#d_price').dataset.auto='0'; if(isNum(r.cost)) $('#d_cost').dataset.auto='0'; if(isNum(r.kwh_car)) $('#d_kwhc').dataset.auto='0'; hintEff('d_');
   const dlg=$('#editDialog'); dlg.showModal();
   f.onsubmit=ev=>{ ev.preventDefault(); if(!requireOnline()) return; try{ const nr=readForm('d_', r); if(!confirmNotDuplicate(nr, r.id)) return; Object.assign(r,nr); bumpOdometer(r); const l=locOf(r.location); if(!l) S.locations.push({name:r.location,category:'other',default_price:isNum(r.price)?r.price:0,night_price:null,default_current:r.current||'AC',prices:[{from:'2000-01-01',price:isNum(r.price)?r.price:0,night:null}]}); save(); dlg.close(); toast('Ενημερώθηκε'); render(); }catch(e){ toast(e.message,true); } };
-  $('#d_del').onclick=()=>{ if(!requireOnline()) return; if(confirm('Διαγραφή αυτής της φόρτισης;')){ if(r.teslafi_id!=null){ S.settings.teslafi_ignore=S.settings.teslafi_ignore||[]; if(!S.settings.teslafi_ignore.includes(r.teslafi_id)) S.settings.teslafi_ignore.push(r.teslafi_id); } S.records=S.records.filter(x=>x.id!==id); save(); dlg.close(); toast('Διαγράφηκε'); render(); } };
+  $('#d_del').onclick=()=>{ if(deleteRecord(id)) dlg.close(); };
   f.onkeydown=ev=>{ if(ev.key==='Enter'&&ev.target.tagName==='INPUT'){ ev.preventDefault(); f.requestSubmit(); } };
 }
 $('#editClose').addEventListener('click',()=>$('#editDialog').close());
@@ -745,12 +757,13 @@ function renderLog(){
   const rs=filteredLog(); const col=LOG_COLS.find(c=>c.k===logSort.key)||LOG_COLS[0];
   rs.sort((a,b)=>{ const x=col.s(a), y=col.s(b); if(x==null&&y==null) return 0; if(x==null) return 1; if(y==null) return -1; return (x<y?-1:x>y?1:0)*logSort.dir; });
   const sum=summarize(rs);
-  const head=`<thead><tr>${LOG_COLS.map(c=>`<th class="${c.left?'l':''} ${c.k===logSort.key?'sorted':''}" data-k="${c.k}">${c.l}${c.k===logSort.key?(logSort.dir>0?' ↑':' ↓'):''}</th>`).join('')}</tr></thead>`;
-  const body=`<tbody>${rs.map(r=>`<tr class="rec ${r.flags?.includes('incomplete')?'flag':''}" data-id="${r.id}" title="${esc(r.note||'')}">${LOG_COLS.map(c=>`<td class="${c.left?'l':''} ${c.cls||''}">${c.v(r)}</td>`).join('')}</tr>`).join('')}</tbody>`;
-  const foot=`<tfoot><tr><td class="l">Σύνολο</td><td class="l">${rs.length} φορτίσεις</td><td></td><td></td><td>${fmt(sum.kwh,1)}</td><td>${fmt(sum.kwhCar,1)}</td><td></td><td></td><td>${fmt(sum.cost,2)}</td><td>${sum.kwh>0?fmt(sum.cost/sum.kwh,3):'–'}</td><td>${isNum(sum.eff)?fmt(sum.eff*100,1)+'%':'–'}</td><td colspan="5"></td></tr></tfoot>`;
+  const head=`<thead><tr>${LOG_COLS.map(c=>`<th class="${c.left?'l':''} ${c.k===logSort.key?'sorted':''}" data-k="${c.k}">${c.l}${c.k===logSort.key?(logSort.dir>0?' ↑':' ↓'):''}</th>`).join('')}<th></th></tr></thead>`;
+  const body=`<tbody>${rs.map(r=>`<tr class="rec ${r.flags?.includes('incomplete')?'flag':''}" data-id="${r.id}" title="${esc(r.note||'')}">${LOG_COLS.map(c=>`<td class="${c.left?'l':''} ${c.cls||''}">${c.v(r)}</td>`).join('')}<td class="del"><button class="xdel" data-del="${r.id}" title="Διαγραφή" aria-label="Διαγραφή">×</button></td></tr>`).join('')}</tbody>`;
+  const foot=`<tfoot><tr><td class="l">Σύνολο</td><td class="l">${rs.length} φορτίσεις</td><td></td><td></td><td>${fmt(sum.kwh,1)}</td><td>${fmt(sum.kwhCar,1)}</td><td></td><td></td><td>${fmt(sum.cost,2)}</td><td>${sum.kwh>0?fmt(sum.cost/sum.kwh,3):'–'}</td><td>${isNum(sum.eff)?fmt(sum.eff*100,1)+'%':'–'}</td><td colspan="6"></td></tr></tfoot>`;
   $('#logTable').innerHTML=head+body+foot; $('#logCount').textContent='';
   $$('#logTable th').forEach(th=>th.addEventListener('click',()=>{ if(logSort.key===th.dataset.k) logSort.dir*=-1; else { logSort.key=th.dataset.k; logSort.dir=th.dataset.k==='date'?-1:1; } renderLog(); }));
-  $$('#logTable tr.rec').forEach(tr=>tr.addEventListener('click',()=>openEdit(tr.dataset.id)));
+  $$('#logTable tr.rec').forEach(tr=>tr.addEventListener('click',ev=>{ if(ev.target.closest('.xdel')) return; openEdit(tr.dataset.id); }));
+  $$('#logTable .xdel').forEach(b=>b.addEventListener('click',ev=>{ ev.stopPropagation(); deleteRecord(b.dataset.del); }));
   if(!rs.length) $('#logTable').innerHTML=head+`<tbody><tr><td colspan="${LOG_COLS.length}" class="empty">Καμία φόρτιση για αυτά τα φίλτρα.</td></tr></tbody>`;
 }
 ['fYear','fMonth','fLoc','fCat','fText'].forEach(id=>$('#'+id).addEventListener('input',renderLog));
@@ -1097,7 +1110,7 @@ function renderSettings(){
   $('#settingsForm').innerHTML = SETTING_FIELDS.map(([k,l,t])=>`<div class="field"><label>${l}</label><input data-k="${k}" ${t==='num'?'inputmode="decimal"':''} value="${st[k]??''}" placeholder="${k==='current_km'?esc(fmtInt(lastOdometer())):''}"></div>`).join('');
   $$('#settingsForm input').forEach(inp=>inp.addEventListener('change',()=>{ if(!requireOnline()){ renderSettings(); return; } const k=inp.dataset.k, t=SETTING_FIELDS.find(f=>f[0]===k)[2]; st[k]= t==='num'? parseNum(inp.value) : inp.value.trim(); if(t==='num'&&inp.value.trim()!==''&&st[k]==null){ toast('Μη έγκυρος αριθμός',true); return; } save(); toast('Αποθηκεύτηκε'); }));
   $$('#themeSeg button').forEach(b=>{ b.classList.toggle('on',(st.theme||'auto')===b.dataset.th); b.onclick=()=>{ st.theme=b.dataset.th; applyTheme(); save(); renderSettings(); }; });
-  $('#appInfo').innerHTML = Store.mode==='server' ? `Τοπική εφαρμογή — τα δεδομένα γράφονται στο <code>${esc(Store.info.data_file||'')}</code>. Έκδοση ${esc(Store.info.version||'')}.` : Store.mode==='remote' ? `Συνδεδεμένη με το Google Drive μέσω Apps Script — αρχείο <code>${esc(Store.info.file||'')}</code>.` : Store.mode==='offline' ? 'Χωρίς σύνδεση αυτή τη στιγμή — προβολή των τελευταίων δεδομένων, νέες φορτίσεις σε ουρά.' : 'Λειτουργία browser: τα δεδομένα μένουν σε αυτόν τον browser. Για το Mac, άνοιξε την εφαρμογή «Tesla kWh» ώστε να αποθηκεύονται σε αρχείο.';
+  $('#appInfo').innerHTML = `Έκδοση εφαρμογής ${APP_VERSION}. ` + (Store.mode==='server' ? `Τοπική εφαρμογή — τα δεδομένα γράφονται στο <code>${esc(Store.info.data_file||'')}</code>. Έκδοση ${esc(Store.info.version||'')}.` : Store.mode==='remote' ? `Συνδεδεμένη με το Google Drive μέσω Apps Script — αρχείο <code>${esc(Store.info.file||'')}</code>.` : Store.mode==='offline' ? 'Χωρίς σύνδεση αυτή τη στιγμή — προβολή των τελευταίων δεδομένων, νέες φορτίσεις σε ουρά.' : 'Λειτουργία browser: τα δεδομένα μένουν σε αυτόν τον browser. Για το Mac, άνοιξε την εφαρμογή «Tesla kWh» ώστε να αποθηκεύονται σε αρχείο.');
   $('#btnQuit').style.display = Store.mode==='server'?'inline-block':'none';
   renderLocs();
 }
@@ -1132,7 +1145,7 @@ function applyTheme(){ const t=S?.settings?.theme||'auto'; if(t==='auto') docume
 /* ===================== boot ===================== */
 (async function(){
   await Store.init();
-  let st=null; try{ st=await Store.load(); }catch(e){ console.error(e); }
+  let st=null; try{ st=await Store.load(); }catch(e){ console.error(e); if(Store.mode==='server'||Store.mode==='remote'){ Store.loadFailed=true; let msg=e.message; try{ const r=await fetch('/api/data'); const j=await r.json(); if(j.error) msg=j.error; }catch(x){} setTimeout(()=>{ setStatus('error'); $('#statusText').textContent='τα δεδομένα δεν φορτώθηκαν'; toast('Τα δεδομένα δεν φορτώθηκαν: '+msg, true); },300); } }
   S = normalizeState(st||emptyState());
   applyTheme(); setStatus('ok'); route();
   if(Store.mode==='server'){ setInterval(()=>{ fetch('/api/ping',{method:'POST'}).catch(()=>{}); }, 60000);
