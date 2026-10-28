@@ -1,0 +1,354 @@
+<!doctype html>
+<html lang="el">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Τεκμηρίωση — Tesla kWh</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect x='3' y='9' width='23' height='14' rx='3' fill='%232B5BD7'/%3E%3Crect x='27' y='13' width='3' height='6' rx='1' fill='%232B5BD7'/%3E%3Cpath d='M17 11l-6 6h4l-2 5 7-7h-4z' fill='%23fff'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+:root{
+  --bg:#F2F4F7; --surface:#FFFFFF; --surface-2:#F7F8FA; --ink:#1A222C; --muted:#5F6B78; --faint:#8A95A1;
+  --line:#E3E7EC; --accent:#2B5BD7; --accent-soft:#E6ECFB; --ok:#1F7A4D; --ok-soft:#E3F4EA; --warn:#8A5A00; --warn-soft:#FDEBD0;
+  --font:"IBM Plex Sans",-apple-system,"Segoe UI",system-ui,Roboto,Arial,sans-serif; --mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;
+}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
+  --bg:#0F1316; --surface:#171C21; --surface-2:#1E252B; --ink:#E7ECF1; --muted:#9AA6B2; --faint:#6F7B87;
+  --line:#2A333C; --accent:#6D93F2; --accent-soft:#1F2C47; --ok:#6FCF97; --ok-soft:#173326; --warn:#F2C26B; --warn-soft:#3A2D12; } }
+:root[data-theme="dark"]{ --bg:#0F1316; --surface:#171C21; --surface-2:#1E252B; --ink:#E7ECF1; --muted:#9AA6B2; --faint:#6F7B87;
+  --line:#2A333C; --accent:#6D93F2; --accent-soft:#1F2C47; --ok:#6FCF97; --ok-soft:#173326; --warn:#F2C26B; --warn-soft:#3A2D12; }
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:72px}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.6 var(--font);-webkit-font-smoothing:antialiased}
+a{color:var(--accent)}
+header.top{position:sticky;top:0;z-index:5;background:var(--surface);border-bottom:1px solid var(--line)}
+.top-in{max-width:1180px;margin:0 auto;padding:12px 16px;display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+.brand{display:flex;align-items:center;gap:10px;font-weight:700;font-size:17px;color:var(--ink);text-decoration:none}
+.brand svg{width:26px;height:26px;color:var(--accent)}
+.brand small{font-weight:500;color:var(--muted);font-size:13px}
+.top-links{margin-left:auto;display:flex;gap:6px;flex-wrap:wrap}
+.top-links a{padding:6px 11px;border-radius:8px;text-decoration:none;color:var(--muted);font-weight:500;font-size:14px}
+.top-links a:hover{background:var(--surface-2);color:var(--ink)}
+.top-links a.on{background:var(--accent-soft);color:var(--accent)}
+.wrap{max-width:1180px;margin:0 auto;padding:24px 16px 80px;display:grid;grid-template-columns:240px minmax(0,1fr);gap:32px}
+nav.toc{position:sticky;top:80px;align-self:start;font-size:14px;max-height:calc(100vh - 100px);overflow:auto}
+nav.toc b{display:block;color:var(--faint);font-size:12px;text-transform:uppercase;letter-spacing:.06em;margin:0 0 8px}
+nav.toc a{display:block;padding:4px 10px;border-left:2px solid var(--line);color:var(--muted);text-decoration:none}
+nav.toc a:hover{color:var(--ink);border-left-color:var(--accent)}
+main{min-width:0}
+h1{font-size:32px;line-height:1.2;margin:4px 0 8px;letter-spacing:-.01em}
+.lead{color:var(--muted);font-size:18px;margin:0 0 24px;max-width:70ch}
+section{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:22px 26px;margin:0 0 18px}
+h2{font-size:22px;margin:0 0 10px;display:flex;align-items:center;gap:10px}
+h2 .n{display:inline-grid;place-items:center;width:28px;height:28px;border-radius:8px;background:var(--accent-soft);color:var(--accent);font-size:14px;font-weight:700}
+h3{font-size:17px;margin:20px 0 6px}
+p,li{max-width:76ch}
+ul,ol{padding-left:22px}
+li{margin:3px 0}
+code{overflow-wrap:anywhere}
+code,kbd{font-family:var(--mono);font-size:.9em;background:var(--surface-2);border:1px solid var(--line);border-radius:5px;padding:1px 5px}
+kbd{border-bottom-width:2px}
+.btnlike{display:inline-block;font-size:.9em;font-weight:500;padding:1px 8px;border-radius:6px;border:1px solid var(--line);background:var(--surface-2);white-space:nowrap}
+.note,.tip,.warn{border-radius:10px;padding:12px 14px;margin:12px 0;font-size:15px}
+.note{background:var(--accent-soft)} .tip{background:var(--ok-soft)} .warn{background:var(--warn-soft)}
+.note b:first-child,.tip b:first-child,.warn b:first-child{display:block;margin-bottom:2px}
+table{border-collapse:collapse;width:100%;font-size:15px;margin:10px 0}
+th,td{text-align:left;padding:7px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+th{color:var(--muted);font-weight:600;font-size:13px;text-transform:uppercase;letter-spacing:.03em}
+.scroll{overflow-x:auto}
+.steps{counter-reset:s;list-style:none;padding:0}
+.steps>li{counter-increment:s;position:relative;padding-left:38px;margin:10px 0}
+.steps>li::before{content:counter(s);position:absolute;left:0;top:1px;width:26px;height:26px;border-radius:50%;background:var(--accent);color:#fff;display:grid;place-items:center;font-size:13px;font-weight:700}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.card{border:1px solid var(--line);border-radius:10px;padding:12px 14px;background:var(--surface-2)}
+.card h4{margin:0 0 4px;font-size:15px}
+.card p{margin:0;font-size:14px;color:var(--muted)}
+footer{color:var(--faint);font-size:13px;text-align:center;margin-top:24px}
+details{border:1px solid var(--line);border-radius:10px;padding:10px 14px;margin:8px 0;background:var(--surface-2)}
+summary{cursor:pointer;font-weight:600}
+@media (max-width:860px){ .wrap{grid-template-columns:1fr;gap:0} nav.toc{display:none} section{padding:18px 16px} h1{font-size:26px} .grid2{grid-template-columns:1fr} }
+@media print{ header.top,nav.toc{display:none} .wrap{display:block} section{break-inside:avoid;border:0;padding:0 0 12px} body{background:#fff} }
+</style>
+<style>
+pre{font-family:var(--mono);font-size:13px;background:var(--surface-2);border:1px solid var(--line);border-radius:10px;padding:12px 14px;overflow:auto;line-height:1.5}
+.arch{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:14px 0}
+.box{border:1.5px solid var(--line);border-radius:10px;padding:10px 12px;background:var(--surface-2);font-size:14px}
+.box b{display:block;font-size:14px}
+.box.mac{border-color:#2B5BD7} .box.cloud{border-color:#1F7A4D} .box.tesla{border-color:#C0392B}
+.flow{font-size:14px;color:var(--muted);margin:6px 0 0}
+td code{white-space:nowrap}
+@media (max-width:860px){ .arch{grid-template-columns:1fr} }
+</style>
+</head>
+<body>
+<header class="top"><div class="top-in">
+  <a class="brand" href="./"><svg viewBox="0 0 32 32" aria-hidden="true"><rect x="3" y="9" width="23" height="14" rx="3" fill="currentColor" opacity=".9"/><rect x="27" y="13" width="3" height="6" rx="1" fill="currentColor" opacity=".9"/><path d="M17 11l-6 6h4l-2 5 7-7h-4z" fill="var(--surface)"/></svg>Tesla kWh <small>by nikmatz@</small></a>
+  <div class="top-links"><a href="./">← Εφαρμογή</a><a href="help.html">Οδηγός χρήσης</a><a href="docs.html" class="on">Τεκμηρίωση</a></div>
+</div></header>
+
+<div class="wrap">
+<nav class="toc" aria-label="Περιεχόμενα">
+  <b>Τεκμηρίωση</b>
+  <a href="#arch">Αρχιτεκτονική</a>
+  <a href="#files">Αρχεία & φάκελοι</a>
+  <a href="#schema">Μορφή δεδομένων</a>
+  <a href="#server">Τοπικός server (Mac)</a>
+  <a href="#bridge">Γέφυρα Apps Script</a>
+  <a href="#tesla">Tesla Fleet API</a>
+  <a href="#match">Αντιστοίχιση & διπλά</a>
+  <a href="#calc">Υπολογισμοί</a>
+  <a href="#update">Ενημέρωση & εγκατάσταση</a>
+  <a href="#secmodel">Μοντέλο ασφαλείας</a>
+  <a href="#changes">Εκδόσεις</a>
+</nav>
+
+<main>
+<h1>Τεχνική τεκμηρίωση</h1>
+<p class="lead">Πώς είναι φτιαγμένη η εφαρμογή, πού είναι τα αρχεία, πώς μιλά με το Google Drive και την Tesla, και πώς ενημερώνεται. Για την καθημερινή χρήση δες τον <a href="help.html">Οδηγό χρήσης</a>.</p>
+<div class="warn"><b>Δημόσιο έγγραφο</b>Αυτή η σελίδα ανεβαίνει στο GitHub. Η διεύθυνση της γέφυρας (URL <code>…/exec</code>), το κλειδί της, το Client Secret και τα δεδομένα <b>δεν</b> γράφονται εδώ και δεν πρέπει να προστεθούν.</div>
+
+<section id="arch">
+<h2><span class="n">1</span>Αρχιτεκτονική</h2>
+<div class="arch">
+  <div class="box mac"><b>Mac</b>Swift παράθυρο (WKWebView) → Python server <code>127.0.0.1:8765</code> → <code>tesla-data.json</code> στο Google Drive (φάκελος συγχρονισμού).</div>
+  <div class="box cloud"><b>iPhone / browser</b>Η ίδια σελίδα από το GitHub Pages (PWA) → γέφυρα Google Apps Script → το ίδιο <code>tesla-data.json</code> στο Drive.</div>
+  <div class="box tesla"><b>Tesla</b>Η γέφυρα Apps Script κρατά τη σύνδεση OAuth και ρωτά το Tesla Fleet API (Supercharger, ζωντανή κατάσταση, παρακολούθηση).</div>
+</div>
+<ul>
+  <li><b>Μία σελίδα</b> (<code>index.html</code>, χωρίς εξαρτήσεις) τρέχει παντού. Καταλαβαίνει μόνη της πού βρίσκεται:
+    <ul><li><code>server</code> αν απαντά το <code>/api/status</code>,</li><li><code>remote</code> αν υπάρχει ρύθμιση γέφυρας,</li><li><code>offline</code> αν έχει τοπική cache,</li><li><code>browser</code> σε κάθε άλλη περίπτωση.</li></ul></li>
+  <li><b>Ένα αρχείο αλήθειας:</b> <code>tesla-data.json</code>. Κάθε εγγραφή γίνεται με αριθμό αναθεώρησης <code>rev</code>. Αν ο αριθμός δεν ταιριάζει, ο server απαντά <code>409</code> και η σελίδα ξαναφορτώνει, οπότε δεν υπάρχει σιωπηλή αντικατάσταση.</li>
+  <li><b>Το Mac δεν χρειάζεται ίντερνετ</b> για τις φορτίσεις. Το χρειάζεται μόνο για τα κουμπιά της Tesla, που περνούν από τη γέφυρα.</li>
+</ul>
+</section>
+
+<section id="files">
+<h2><span class="n">2</span>Αρχεία & φάκελοι</h2>
+<div class="scroll"><table>
+<tr><th>Πού</th><th>Τι</th></tr>
+<tr><td><code>~/Applications/Tesla kWh/</code></td><td>Η εφαρμογή που τρέχει: <code>Tesla kWh.app</code>, <code>tesla_app.py</code>, <code>tesla_app_config.json</code> (δείχνει τον φάκελο δεδομένων), <code>index.html</code>, <code>help.html</code>, <code>docs.html</code>, εικονίδια, <code>manifest.webmanifest</code>, <code>sw.js</code>.</td></tr>
+<tr><td>Google Drive › Οικονομικά › Car-Moto › Cars › 2024 Tesla M3SR › <code>Tesla kWh δεδομένα/</code></td><td><code>tesla-data.json</code> και <code>backups/</code>.</td></tr>
+<tr><td>OneDrive › Programming › <code>Tesla/</code></td><td>Πρωτότυπα και εργαλεία: <code>index.html</code>, <code>tesla_app.py</code>, <code>Tesla.xlsx</code>, CSV του TeslaFi, <code>ΕΛΕΓΧΟΣ-ΣΥΝΕΠΕΙΑΣ.md</code>, <code>tools/</code>.</td></tr>
+<tr><td>OneDrive › Tesla › <code>για-GitHub/</code></td><td>Ό,τι ανεβαίνει στο repo <code>tesla-kwh</code>: <code>index.html</code>, <code>help.html</code>, <code>docs.html</code>, <code>manifest.webmanifest</code>, <code>sw.js</code>, εικονίδια, <code>.nojekyll</code>.</td></tr>
+<tr><td>OneDrive › Tesla › <code>apps-script/</code></td><td><code>Code.gs</code> (ο κώδικας της γέφυρας) και <code>tesla-private-key.pem</code>. <b>Ποτέ στο GitHub.</b></td></tr>
+<tr><td>GitHub <code>nikmatz/nikmatz.github.io</code></td><td>Μόνο <code>.nojekyll</code> και <code>.well-known/appspecific/com.tesla.3p.public-key.pem</code> (δημόσιο κλειδί για την Tesla).</td></tr>
+<tr><td>GitHub <code>nikmatz/tesla-kwh</code></td><td>Η εφαρμογή για iPhone/browser (GitHub Pages).</td></tr>
+</table></div>
+</section>
+
+<section id="schema">
+<h2><span class="n">3</span>Μορφή δεδομένων</h2>
+<pre>{
+  "rev": 6,
+  "settings":  { … },
+  "locations": [ { "name": "Home", "category": "home", "default_current": "AC",
+                   "prices": [ {"from":"2024-01-01","price":0.19,"night":null}, … ] }, … ],
+  "records":   [ { "id": "…", "date": "2026-10-20", "start": "13:44", "end": "14:07", … }, … ]
+}</pre>
+<h3>Εγγραφή φόρτισης</h3>
+<div class="scroll"><table>
+<tr><th>Πεδίο</th><th>Περιγραφή</th></tr>
+<tr><td><code>id</code></td><td>Μοναδικό αναγνωριστικό.</td></tr>
+<tr><td><code>date, start, end, duration_min</code></td><td>Τοπική ώρα του σταθμού (όχι UTC).</td></tr>
+<tr><td><code>location</code></td><td>Όνομα τοποθεσίας από το <code>locations</code>.</td></tr>
+<tr><td><code>pct_start, pct_end</code></td><td>% μπαταρίας.</td></tr>
+<tr><td><code>kwh_charger</code></td><td>«Kwh real», kWh από τον φορτιστή. Για Supercharger, τα χρεωμένα kWh της Tesla (<code>usageBase</code>).</td></tr>
+<tr><td><code>kwh_car</code></td><td>«kwh car», kWh στη μπαταρία (TeslaFi <code>kWh Added</code> ή Tesla <code>charge_energy_added</code>).</td></tr>
+<tr><td><code>current, tariff</code></td><td><code>AC</code>/<code>DC</code>· <code>N</code> νύχτα / <code>H</code> ημέρα.</td></tr>
+<tr><td><code>cost, price</code></td><td>€ και €/kWh.</td></tr>
+<tr><td><code>odometer</code></td><td>km.</td></tr>
+<tr><td><code>range100_km, range_src</code></td><td>Αυτονομία του BMS αναγόμενη στο 100% (<code>teslafi</code>: Range Added ÷ Δ%· <code>tesla</code>: ζωντανή τιμή στο τέλος φόρτισης στο 100%).</td></tr>
+<tr><td><code>source</code></td><td><code>sheet</code>, <code>teslafi</code>, <code>sheet+teslafi</code>, <code>manual</code>, <code>tesla</code>, και συνδυασμοί με <code>+tesla</code>.</td></tr>
+<tr><td><code>teslafi_id</code></td><td>Charge Number του TeslaFi.</td></tr>
+<tr><td><code>tesla_id</code></td><td>sessionId της Tesla. Αν είναι δύο συνεδρίες σε μία εγγραφή, χωρίζονται με κόμμα.</td></tr>
+<tr><td><code>note</code></td><td>Ελεύθερο κείμενο. Εδώ γράφονται και οι παλιές τιμές όταν κάτι διορθώνεται.</td></tr>
+<tr><td><code>flags</code></td><td>Βλ. παρακάτω.</td></tr>
+</table></div>
+<h3>Σήματα (<code>flags</code>)</h3>
+<div class="scroll"><table>
+<tr><th>Σήμα</th><th>Σημασία</th></tr>
+<tr><td><code>cost_confirmed</code></td><td>Το κόστος είναι πραγματικό (Excel, Tesla, ή γραμμένο από σένα). Δεν αλλάζει σε ανατιμολόγηση.</td></tr>
+<tr><td><code>cost_estimated</code></td><td>Εκτίμηση (π.χ. Supercharger ≈0,50 €/kWh πριν τον έλεγχο στην Tesla).</td></tr>
+<tr><td><code>free_credit</code></td><td>Δωρεάν (credits ή δωρεάν σταθμός).</td></tr>
+<tr><td><code>incomplete</code></td><td>Λείπει % ή kWh.</td></tr>
+<tr><td><code>estimated</code></td><td>Υποθετική εγγραφή που καλύπτει κενό.</td></tr>
+<tr><td><code>corrected</code></td><td>Διορθώθηκε τυπογραφικό (π.χ. %) με βάση άλλη πηγή.</td></tr>
+<tr><td><code>teslafi_filled</code></td><td>Πεδία συμπληρώθηκαν από το TeslaFi.</td></tr>
+<tr><td><code>tesla_live</code></td><td>Καταχωρήθηκε με τα κουμπιά «από Tesla».</td></tr>
+</table></div>
+<h3>Τοποθεσίες & ρυθμίσεις</h3>
+<ul>
+  <li><b>Κατηγορίες</b> τοποθεσίας: <code>free</code>, <code>home</code>, <code>supercharger</code>, <code>other</code>. Οι τιμές ανά περίοδο είναι στο <code>prices[]</code>, και ισχύει η πιο πρόσφατη με <code>from ≤ ημερομηνία</code>.</li>
+  <li><b>Σημαντικά κλειδιά του <code>settings</code>:</b>
+    <ul>
+      <li><code>battery_nominal_kwh</code>, <code>battery_usable_kwh</code></li>
+      <li><code>petrol_l_per_100km</code>, <code>petrol_price_year</code></li>
+      <li><code>teslafi_map</code> (διεύθυνση → τοποθεσία), <code>teslafi_ignore</code></li>
+      <li><code>tesla_pending</code> (φόρτιση σε εξέλιξη), <code>loc_coords</code> (στίγματα που έμαθε η εφαρμογή ανά τοποθεσία)</li>
+      <li><code>theme</code></li>
+    </ul></li>
+  <li>Στο <code>localStorage</code> κάθε συσκευής (όχι στο αρχείο): <code>tesla-kwh-remote</code> (URL και κλειδί γέφυρας), <code>tesla-kwh-cache</code> (αντίγραφο για offline), ουρά offline.</li>
+</ul>
+</section>
+
+<section id="server">
+<h2><span class="n">4</span>Τοπικός server (Mac)</h2>
+<p><code>tesla_app.py</code>: Python χωρίς εξωτερικές βιβλιοθήκες. Τον ξεκινά το <code>Tesla kWh.app</code> με <code>--parent-pid</code> και κλείνει μαζί του.</p>
+<div class="scroll"><table>
+<tr><th>Αίτημα</th><th>Τι κάνει</th></tr>
+<tr><td><code>GET /</code>, <code>/help.html</code>, <code>/docs.html</code>, εικονίδια</td><td>Στατικά αρχεία.</td></tr>
+<tr><td><code>GET /api/status</code></td><td>Έκδοση, διαδρομή αρχείου, <code>rev</code>.</td></tr>
+<tr><td><code>GET /api/data</code></td><td>Όλο το JSON.</td></tr>
+<tr><td><code>PUT /api/data</code> + <code>X-Rev</code></td><td>Αποθήκευση. Απαντά <code>409</code> αν άλλαξε στο μεταξύ. Η εγγραφή γίνεται ατομικά (προσωρινό αρχείο και μετονομασία) και κρατά <code>.bak</code> και αντίγραφο στο <code>backups/</code>.</td></tr>
+<tr><td><code>POST /api/records</code></td><td>Προσθήκη εγγραφών (ουρά offline).</td></tr>
+<tr><td><code>GET /api/export/xlsx</code>, <code>/api/export/csv</code></td><td>Εξαγωγή.</td></tr>
+<tr><td><code>/api/ping</code>, <code>/api/quit</code></td><td>Διαχείριση.</td></tr>
+</table></div>
+<p>Αν λείπει το αρχείο δεδομένων, ο server <b>αρνείται</b> να διαβάσει ή να γράψει (503/400). Ποτέ δεν δημιουργεί άδειο αρχείο.</p>
+</section>
+
+<section id="bridge">
+<h2><span class="n">5</span>Γέφυρα Apps Script</h2>
+<p>Web app (Execute as: Me · Who has access: Anyone). Κάθε αίτημα θέλει το <code>key</code>. Τα αιτήματα <code>GET</code> στέλνουν <code>?key=…&action=…</code>, τα <code>POST</code> στέλνουν JSON.</p>
+<div class="scroll"><table>
+<tr><th>action</th><th>Τι κάνει</th></tr>
+<tr><td><code>status</code></td><td>Έκδοση γέφυρας (<code>drive-N</code>), <code>rev</code>, πλήθος εγγραφών, αν υπάρχει σύνδεση με Tesla.</td></tr>
+<tr><td><code>data</code></td><td>Όλο το JSON.</td></tr>
+<tr><td><code>put</code> (POST)</td><td>Αποθήκευση με έλεγχο <code>rev</code>, κλείδωμα (LockService) και αντίγραφο στο <code>backups/</code> του Drive.</td></tr>
+<tr><td><code>append</code> (POST)</td><td>Προσθήκη εγγραφών που λείπουν.</td></tr>
+<tr><td><code>tesla_login</code></td><td>Σελίδα με τον σύνδεσμο OAuth της Tesla. Η επιστροφή γίνεται στο ίδιο <code>/exec</code> και κρατά το refresh token.</td></tr>
+<tr><td><code>tesla_history&from=ISO</code></td><td>Ιστορικό Supercharger, κανονικοποιημένο: <code>id, vin, site, start, stop, kwh, cost, currency, pricing</code>. Με <code>raw=1</code> φέρνει και τα αναλυτικά <code>fees</code>.</td></tr>
+<tr><td><code>tesla_live&wake=1</code></td><td>Ζωντανή κατάσταση: μπαταρία, φόρτιση, kW, kWh, κοντέρ (km), αυτονομία, θερμοκρασίες, στίγμα.</td></tr>
+<tr><td><code>tesla_watch_start</code> / <code>_status</code> / <code>_cancel</code></td><td>Παρακολούθηση μιας φόρτισης με χρονική εργασία ανά 10′ (<code>watchTick</code>), που δεν ξυπνά ποτέ το αυτοκίνητο.</td></tr>
+<tr><td><code>tesla_vehicles</code>, <code>tesla_logout</code></td><td>Διάγνωση και αποσύνδεση.</td></tr>
+</table></div>
+<h3>Script properties</h3>
+<p><code>FOLDER_ID</code>, <code>TESLA_CLIENT_ID</code>, <code>TESLA_CLIENT_SECRET</code>, <code>TESLA_REFRESH</code> (από τη σύνδεση), <code>TESLA_WATCH</code> (κατάσταση παρακολούθησης). Το access token κρατιέται προσωρινά στην cache.</p>
+<h3>Συναρτήσεις που τρέχουν από τον editor</h3>
+<ul>
+  <li><code>registerPartner</code>: μία φορά, καταχωρεί το domain <code>nikmatz.github.io</code> στην Tesla. Αναμενόμενη απάντηση: 200.</li>
+  <li><code>authorizeTriggers</code>: μία φορά, δίνει την άδεια για τις χρονικές εργασίες.</li>
+</ul>
+</section>
+
+<section id="tesla">
+<h2><span class="n">6</span>Tesla Fleet API</h2>
+<ul>
+  <li><b>Περιοχή:</b> Ευρώπη, <code>fleet-api.prd.eu.vn.cloud.tesla.com</code>. Auth: <code>auth.tesla.com/oauth2/v3</code>, token στο <code>fleet-auth.prd.vn.cloud.tesla.com</code>.</li>
+  <li><b>Εφαρμογή:</b> «nikmatz kWh Log» στο developer.tesla.com.
+    <ul>
+      <li>Allowed origin: <code>https://nikmatz.github.io</code></li>
+      <li>Redirect URI: η διεύθυνση <code>/exec</code> της γέφυρας</li>
+      <li>Grant types: authorization code και client credentials</li>
+    </ul></li>
+  <li><b>Scopes:</b> <code>openid offline_access vehicle_device_data vehicle_location vehicle_charging_cmds</code>. Το τελευταίο το απαιτεί η Tesla για το ιστορικό φορτίσεων. Εντολές δεν στέλνονται.</li>
+  <li><b>Endpoints που χρησιμοποιούνται:</b>
+    <ul>
+      <li><code>GET /api/1/dx/charging/history</code> (σελίδες των 50)</li>
+      <li><code>GET /api/1/vehicles</code> (δεν ξυπνά το αυτοκίνητο)</li>
+      <li><code>GET /api/1/vehicles/{vin}/vehicle_data?endpoints=charge_state;drive_state;vehicle_state;climate_state;location_data</code></li>
+      <li><code>POST /api/1/vehicles/{vin}/wake_up</code> (μόνο με κουμπί)</li>
+    </ul></li>
+  <li><b>Ιστορικό Supercharger:</b> τα kWh είναι το <code>usageBase</code> της χρέωσης <code>CHARGING</code>. Τα <code>usageTier*</code> είναι λεπτά ανά βαθμίδα ισχύος, όχι kWh. Το <code>pricingType</code> <code>CREDIT</code> ή <code>FREE_SITE</code> σημαίνει δωρεάν.</li>
+  <li><b>Ζωντανά:</b> το κοντέρ και η αυτονομία έρχονται σε μίλια και μετατρέπονται (× 1,609344).</li>
+  <li><b>Κόστος:</b> η Tesla χρεώνει ανά αίτημα, με δωρεάν πίστωση 10 $ τον μήνα για ιδιώτες. Τα αιτήματα <code>wake_up</code> είναι τα ακριβότερα, γι' αυτό γίνονται μόνο με κουμπί.</li>
+  <li><b>Δημόσιο κλειδί:</b> <code>https://nikmatz.github.io/.well-known/appspecific/com.tesla.3p.public-key.pem</code> (EC prime256v1). Το ιδιωτικό δεν χρησιμοποιείται: χρειάζεται μόνο για υπογεγραμμένες εντολές μέσω virtual key, που δεν έχει εγκατασταθεί.</li>
+</ul>
+</section>
+
+<section id="match">
+<h2><span class="n">7</span>Αντιστοίχιση & διπλά</h2>
+<h3>Tesla → εφαρμογή (Supercharger)</h3>
+<ol>
+  <li>Αν το <code>sessionId</code> υπάρχει ήδη σε κάποιο <code>tesla_id</code>, η φόρτιση συνδέεται με εκείνη την εγγραφή.</li>
+  <li>Αλλιώς ψάχνει εγγραφή Supercharger <b>ίδιας ημερομηνίας</b> με ώρα έναρξης ±20′, ή που η συνεδρία πέφτει μέσα στο διάστημά της (TeslaFi που ένωσε δύο συνεδρίες).</li>
+  <li>Εγγραφές χωρίς ώρα αντιστοιχίζονται με kWh ±12% (ελάχιστο 2 kWh).</li>
+  <li>Πολλές συνεδρίες στην ίδια εγγραφή αθροίζονται (kWh, €).</li>
+  <li><b>Πρόταση:</b>
+    <ul>
+      <li><i>ίδια</i>: τίποτα να αλλάξει·</li>
+      <li><i>διόρθωση</i>: τσεκαρισμένη, εκτός αν τα kWh διαφέρουν πάνω από 15%·</li>
+      <li><i>νέα</i>: τσεκαρισμένη·</li>
+      <li><i>νόμισμα;</i>: όταν δεν υπάρχει ισοτιμία.</li>
+    </ul></li>
+  <li>Ισχύει πάντα η τοπική ώρα του σταθμού, όπως γράφεται στο ISO string της Tesla, χωρίς μετατροπή ζώνης ώρας.</li>
+</ol>
+<h3>TeslaFi → εφαρμογή</h3>
+<ul>
+  <li>Διπλή θεωρείται μια φόρτιση με ίδιο <code>Charge Number</code>, ή αριθμό που υπάρχει στο <code>teslafi_ignore</code>.</li>
+  <li>Επίσης διπλή θεωρείται μια φόρτιση με ίδια ημερομηνία και kWh ±max(0,35, 3%), ή με ±3 μέρες, ίδια kWh car και ίδιο % αρχής.</li>
+  <li>Παραλείπονται οι μηδενικές (&lt; 0,5 kWh) και οι χειρόγραφες του TeslaFi, δηλαδή όσες δεν έχουν ώρες.</li>
+</ul>
+</section>
+
+<section id="calc">
+<h2><span class="n">8</span>Υπολογισμοί</h2>
+<div class="scroll"><table>
+<tr><th>Μέγεθος</th><th>Τύπος</th></tr>
+<tr><td>Απόδοση φόρτισης</td><td><code>kwh_car / kwh_charger</code></td></tr>
+<tr><td>Κατανάλωση</td><td><code>(Σ kwh_car − ενέργεια ακόμη στη μπαταρία) / km × 100</code>, όπου ενέργεια στη μπαταρία = ωφέλιμη × τρέχον %</td></tr>
+<tr><td>Χωρητικότητα μιας φόρτισης</td><td><code>kwh_car / (pct_end − pct_start) × 100</code></td></tr>
+<tr><td>Υγεία μπαταρίας</td><td>Μόνο φορτίσεις με <code>pct_end ≥ 99,5</code> και Δ% ≥ 30 (βαθμονόμηση LFP στο 100%). Η τάση υπολογίζεται με Theil–Sen ως προς τον χρόνο, και η κλίση ανά 10.000 km ως προς το κοντέρ. Η μεταβολή αναφέρεται στην αρχική τιμή της τάσης.</td></tr>
+<tr><td>Αυτονομία στο 100%</td><td><code>range_added / Δ% × 100</code> (TeslaFi) ή <code>battery_range / (battery/100)</code> σε φόρτιση που τελείωσε στο 100%. Η τάση υπολογίζεται με Theil–Sen.</td></tr>
+<tr><td>Εκτίμηση Kwh real (ζωντανά)</td><td><code>energy_added / διάμεση απόδοση τοποθεσίας</code> (τουλάχιστον 3 φορτίσεις, αλλιώς 0,90 AC / 0,96 DC).</td></tr>
+<tr><td>Κόστος από τιμή</td><td><code>kwh_charger × τιμή περιόδου</code> (νυχτερινή αν <code>tariff=N</code>).</td></tr>
+<tr><td>Σύγκριση με βενζίνη</td><td><code>Σ_έτη km_έτους × λίτρα/100 km × τιμή_έτους / 100 − κόστος ρεύματος</code>. Τιμές αμόλυβδης: μέσοι όροι του EU Weekly Oil Bulletin για την Ελλάδα (2024: 1,855 · 2025: 1,761 · 2026: 1,981 €/λ, μέχρι τον Οκτώβριο).</td></tr>
+<tr><td>Ξένα νομίσματα (Supercharger)</td><td>Ποσό ÷ ισοτιμία ΕΚΤ, ενδεικτικά CHF 0,93, CZK 24,3. Αλλάζουν με το <code>settings.fx</code>.</td></tr>
+</table></div>
+</section>
+
+<section id="update">
+<h2><span class="n">9</span>Ενημέρωση & εγκατάσταση</h2>
+<h3>Νέα έκδοση της σελίδας</h3>
+<ol class="steps">
+  <li>Το <code>index.html</code>, το <code>help.html</code> και το <code>docs.html</code> μπαίνουν σε τρία σημεία: <code>~/Applications/Tesla kWh/</code>, <code>OneDrive/Tesla/</code> και <code>OneDrive/Tesla/για-GitHub/</code>.</li>
+  <li>Στο Mac κλείσε (<kbd>⌘Q</kbd>) και άνοιξε ξανά την εφαρμογή.</li>
+  <li>Για το iPhone: στο repo <code>tesla-kwh</code> → <b>Add file → Upload files</b> → σύρε τα αρχεία του «για-GitHub» → Commit. Το iPhone παίρνει τη νέα έκδοση στο επόμενο άνοιγμα, γιατί ο service worker ζητά πρώτα από το δίκτυο.</li>
+</ol>
+<h3>Νέα έκδοση της γέφυρας (Code.gs)</h3>
+<ol class="steps">
+  <li>script.google.com → «Tesla kWh bridge» → editor → αντικατάσταση όλου του κώδικα με το <code>apps-script/Code.gs</code> → <kbd>⌘S</kbd>.</li>
+  <li>Αν η νέα έκδοση ζητά νέες άδειες, τρέξε μία φορά τη συνάρτηση που αναφέρεται (π.χ. <code>authorizeTriggers</code>).</li>
+  <li><b>Deploy → Manage deployments</b> → η υπάρχουσα ανάπτυξη → ✎ → <b>Version: New version</b> → Deploy. <b>Όχι</b> «New deployment», γιατί αυτό αλλάζει τη διεύθυνση.</li>
+  <li>Έλεγχος: το <code>action=status</code> πρέπει να δείχνει τη νέα <code>version</code>.</li>
+</ol>
+<h3>Νέα άδεια στην Tesla</h3>
+<p>Πρόσθεσέ την στην εφαρμογή στο developer.tesla.com και στο <code>TESLA_SCOPES</code> του Code.gs. Μετά ξανακάνε τη σύνδεση (login) με όλες τις άδειες τσεκαρισμένες.</p>
+<h3>Νέος υπολογιστής Mac</h3>
+<p>Αντέγραψε τον φάκελο <code>Tesla kWh</code> στο <code>~/Applications</code>. Έλεγξε ότι το <code>tesla_app_config.json</code> δείχνει τον σωστό φάκελο Google Drive: το <code>My Drive (nikmatz@gmail.com)</code> που συγχρονίζεται, όχι κάποιο παλιό <code>My Drive</code>. Στο πρώτο άνοιγμα κάνε δεξί κλικ → Άνοιγμα. Το παράθυρο Swift μεταγλωττίζεται αυτόματα την πρώτη φορά, και χρειάζονται τα Command Line Tools.</p>
+</section>
+
+<section id="secmodel">
+<h2><span class="n">10</span>Μοντέλο ασφαλείας</h2>
+<div class="scroll"><table>
+<tr><th>Στοιχείο</th><th>Πού ζει</th><th>Τι επιτρέπει</th></tr>
+<tr><td>Δημόσιο κλειδί Tesla</td><td>GitHub (δημόσιο)</td><td>Τίποτα. Η Tesla το χρησιμοποιεί μόνο για να επιβεβαιώσει το domain.</td></tr>
+<tr><td>Ιδιωτικό κλειδί Tesla</td><td>OneDrive <code>apps-script/</code></td><td>Υπογραφή εντολών, <b>μόνο</b> αν είχε εγκατασταθεί virtual key στο αυτοκίνητο, κάτι που δεν έχει γίνει.</td></tr>
+<tr><td>Client ID / Secret</td><td>Script properties</td><td>Μόνα τους δεν δίνουν πρόσβαση στο αυτοκίνητο, γιατί χρειάζεται και το login του κατόχου.</td></tr>
+<tr><td>Refresh token</td><td>Script properties</td><td>Ανάγνωση στοιχείων αυτοκινήτου και ιστορικού. Ανακαλείται από τον λογαριασμό Tesla (εφαρμογές τρίτων).</td></tr>
+<tr><td>URL + κλειδί γέφυρας</td><td>Ρυθμίσεις κάθε συσκευής (localStorage)</td><td>Ανάγνωση/εγγραφή δεδομένων, ζωντανή κατάσταση και στίγμα. Δεν δημοσιεύονται πουθενά.</td></tr>
+</table></div>
+<p>Η σελίδα δεν περιέχει κανένα μυστικό και δεν φορτώνει τρίτο κώδικα, εκτός από τη γραμματοσειρά από το Google Fonts.</p>
+</section>
+
+<section id="changes">
+<h2><span class="n">11</span>Εκδόσεις</h2>
+<div class="scroll"><table>
+<tr><th>Έκδοση</th><th>Αλλαγές</th></tr>
+<tr><td>1.11</td><td>Αυτονομία στο 100% (BMS) ως δεύτερος δείκτης υγείας μπαταρίας. Οδηγός χρήσης και τεκμηρίωση σε HTML.</td></tr>
+<tr><td>1.10</td><td>Υγεία μπαταρίας LFP μόνο από φορτίσεις στο 100%, με τάση Theil–Sen.</td></tr>
+<tr><td>1.9</td><td>Παρακολούθηση φόρτισης χωρίς ξύπνημα. Σύγκριση με βενζίνη ανά έτος με πραγματικές τιμές αμόλυβδης.</td></tr>
+<tr><td>1.8</td><td>Ζωντανά από την Tesla: κατάσταση, έναρξη/τέλος φόρτισης, εκμάθηση τοποθεσιών.</td></tr>
+<tr><td>1.7</td><td>Νέα αντιστοίχιση Supercharger: τοπική ώρα, ±20′, ένωση συνεδριών, νομίσματα, «kWh ≠».</td></tr>
+<tr><td>1.6</td><td>Πρώτη σύνδεση με την Tesla (ιστορικό Supercharger).</td></tr>
+<tr><td>1.0–1.5</td><td>Εφαρμογή Mac, εισαγωγή Excel/TeslaFi, τιμές ανά περίοδο, iPhone μέσω Google Drive.</td></tr>
+</table></div>
+</section>
+
+<footer>Tesla kWh by nikmatz@ · Τεκμηρίωση · <a href="help.html">Οδηγός χρήσης</a> · <a href="./">Εφαρμογή</a></footer>
+</main>
+</div>
+<script>try{const t=JSON.parse(localStorage.getItem('tesla-kwh-cache')||'null'); const th=t&&t.settings&&t.settings.theme; if(th==='dark'||th==='light') document.documentElement.dataset.theme=th;}catch(e){}</script>
+</body>
+</html>

@@ -1,0 +1,308 @@
+<!doctype html>
+<html lang="el">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Οδηγός χρήσης — Tesla kWh</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect x='3' y='9' width='23' height='14' rx='3' fill='%232B5BD7'/%3E%3Crect x='27' y='13' width='3' height='6' rx='1' fill='%232B5BD7'/%3E%3Cpath d='M17 11l-6 6h4l-2 5 7-7h-4z' fill='%23fff'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+:root{
+  --bg:#F2F4F7; --surface:#FFFFFF; --surface-2:#F7F8FA; --ink:#1A222C; --muted:#5F6B78; --faint:#8A95A1;
+  --line:#E3E7EC; --accent:#2B5BD7; --accent-soft:#E6ECFB; --ok:#1F7A4D; --ok-soft:#E3F4EA; --warn:#8A5A00; --warn-soft:#FDEBD0;
+  --font:"IBM Plex Sans",-apple-system,"Segoe UI",system-ui,Roboto,Arial,sans-serif; --mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;
+}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
+  --bg:#0F1316; --surface:#171C21; --surface-2:#1E252B; --ink:#E7ECF1; --muted:#9AA6B2; --faint:#6F7B87;
+  --line:#2A333C; --accent:#6D93F2; --accent-soft:#1F2C47; --ok:#6FCF97; --ok-soft:#173326; --warn:#F2C26B; --warn-soft:#3A2D12; } }
+:root[data-theme="dark"]{ --bg:#0F1316; --surface:#171C21; --surface-2:#1E252B; --ink:#E7ECF1; --muted:#9AA6B2; --faint:#6F7B87;
+  --line:#2A333C; --accent:#6D93F2; --accent-soft:#1F2C47; --ok:#6FCF97; --ok-soft:#173326; --warn:#F2C26B; --warn-soft:#3A2D12; }
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:72px}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.6 var(--font);-webkit-font-smoothing:antialiased}
+a{color:var(--accent)}
+header.top{position:sticky;top:0;z-index:5;background:var(--surface);border-bottom:1px solid var(--line)}
+.top-in{max-width:1180px;margin:0 auto;padding:12px 16px;display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+.brand{display:flex;align-items:center;gap:10px;font-weight:700;font-size:17px;color:var(--ink);text-decoration:none}
+.brand svg{width:26px;height:26px;color:var(--accent)}
+.brand small{font-weight:500;color:var(--muted);font-size:13px}
+.top-links{margin-left:auto;display:flex;gap:6px;flex-wrap:wrap}
+.top-links a{padding:6px 11px;border-radius:8px;text-decoration:none;color:var(--muted);font-weight:500;font-size:14px}
+.top-links a:hover{background:var(--surface-2);color:var(--ink)}
+.top-links a.on{background:var(--accent-soft);color:var(--accent)}
+.wrap{max-width:1180px;margin:0 auto;padding:24px 16px 80px;display:grid;grid-template-columns:240px minmax(0,1fr);gap:32px}
+nav.toc{position:sticky;top:80px;align-self:start;font-size:14px;max-height:calc(100vh - 100px);overflow:auto}
+nav.toc b{display:block;color:var(--faint);font-size:12px;text-transform:uppercase;letter-spacing:.06em;margin:0 0 8px}
+nav.toc a{display:block;padding:4px 10px;border-left:2px solid var(--line);color:var(--muted);text-decoration:none}
+nav.toc a:hover{color:var(--ink);border-left-color:var(--accent)}
+main{min-width:0}
+h1{font-size:32px;line-height:1.2;margin:4px 0 8px;letter-spacing:-.01em}
+.lead{color:var(--muted);font-size:18px;margin:0 0 24px;max-width:70ch}
+section{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:22px 26px;margin:0 0 18px}
+h2{font-size:22px;margin:0 0 10px;display:flex;align-items:center;gap:10px}
+h2 .n{display:inline-grid;place-items:center;width:28px;height:28px;border-radius:8px;background:var(--accent-soft);color:var(--accent);font-size:14px;font-weight:700}
+h3{font-size:17px;margin:20px 0 6px}
+p,li{max-width:76ch}
+ul,ol{padding-left:22px}
+li{margin:3px 0}
+code{overflow-wrap:anywhere}
+code,kbd{font-family:var(--mono);font-size:.9em;background:var(--surface-2);border:1px solid var(--line);border-radius:5px;padding:1px 5px}
+kbd{border-bottom-width:2px}
+.btnlike{display:inline-block;font-size:.9em;font-weight:500;padding:1px 8px;border-radius:6px;border:1px solid var(--line);background:var(--surface-2);white-space:nowrap}
+.note,.tip,.warn{border-radius:10px;padding:12px 14px;margin:12px 0;font-size:15px}
+.note{background:var(--accent-soft)} .tip{background:var(--ok-soft)} .warn{background:var(--warn-soft)}
+.note b:first-child,.tip b:first-child,.warn b:first-child{display:block;margin-bottom:2px}
+table{border-collapse:collapse;width:100%;font-size:15px;margin:10px 0}
+th,td{text-align:left;padding:7px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+th{color:var(--muted);font-weight:600;font-size:13px;text-transform:uppercase;letter-spacing:.03em}
+.scroll{overflow-x:auto}
+.steps{counter-reset:s;list-style:none;padding:0}
+.steps>li{counter-increment:s;position:relative;padding-left:38px;margin:10px 0}
+.steps>li::before{content:counter(s);position:absolute;left:0;top:1px;width:26px;height:26px;border-radius:50%;background:var(--accent);color:#fff;display:grid;place-items:center;font-size:13px;font-weight:700}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.card{border:1px solid var(--line);border-radius:10px;padding:12px 14px;background:var(--surface-2)}
+.card h4{margin:0 0 4px;font-size:15px}
+.card p{margin:0;font-size:14px;color:var(--muted)}
+footer{color:var(--faint);font-size:13px;text-align:center;margin-top:24px}
+details{border:1px solid var(--line);border-radius:10px;padding:10px 14px;margin:8px 0;background:var(--surface-2)}
+summary{cursor:pointer;font-weight:600}
+@media (max-width:860px){ .wrap{grid-template-columns:1fr;gap:0} nav.toc{display:none} section{padding:18px 16px} h1{font-size:26px} .grid2{grid-template-columns:1fr} }
+@media print{ header.top,nav.toc{display:none} .wrap{display:block} section{break-inside:avoid;border:0;padding:0 0 12px} body{background:#fff} }
+</style>
+</head>
+<body>
+<header class="top"><div class="top-in">
+  <a class="brand" href="./"><svg viewBox="0 0 32 32" aria-hidden="true"><rect x="3" y="9" width="23" height="14" rx="3" fill="currentColor" opacity=".9"/><rect x="27" y="13" width="3" height="6" rx="1" fill="currentColor" opacity=".9"/><path d="M17 11l-6 6h4l-2 5 7-7h-4z" fill="var(--surface)"/></svg>Tesla kWh <small>by nikmatz@</small></a>
+  <div class="top-links"><a href="./">← Εφαρμογή</a><a href="help.html" class="on">Οδηγός χρήσης</a><a href="docs.html">Τεκμηρίωση</a></div>
+</div></header>
+
+<div class="wrap">
+<nav class="toc" aria-label="Περιεχόμενα">
+  <b>Περιεχόμενα</b>
+  <a href="#intro">Τι είναι</a>
+  <a href="#devices">Mac, iPhone, browser</a>
+  <a href="#entry">Νέα φόρτιση</a>
+  <a href="#live">Από την Tesla, ζωντανά</a>
+  <a href="#log">Ημερολόγιο</a>
+  <a href="#summary">Σύνοψη</a>
+  <a href="#battery">Υγεία μπαταρίας (LFP)</a>
+  <a href="#import">Εισαγωγή δεδομένων</a>
+  <a href="#settings">Ρυθμίσεις & τιμές</a>
+  <a href="#rules">Κανόνες δεδομένων</a>
+  <a href="#backups">Αντίγραφα ασφαλείας</a>
+  <a href="#trouble">Προβλήματα & λύσεις</a>
+  <a href="#security">Ασφάλεια</a>
+  <a href="#faq">Συχνές ερωτήσεις</a>
+</nav>
+
+<main>
+<h1>Οδηγός χρήσης</h1>
+<p class="lead">Πώς καταγράφεις τις φορτίσεις του Model 3 SR (LFP), πώς φέρνεις δεδομένα από την Tesla και το TeslaFi, και πώς διαβάζεις τα στατιστικά. Για τα τεχνικά (αρχεία, μορφή δεδομένων, Apps Script, Tesla API) δες την <a href="docs.html">Τεκμηρίωση</a>.</p>
+
+<section id="intro">
+<h2><span class="n">1</span>Τι είναι</h2>
+<p>Το <b>Tesla kWh</b> είναι το ημερολόγιο φορτίσεων που αντικατέστησε το φύλλο «Kwh» του <code>Tesla.xlsx</code>. Κάθε φόρτιση έχει ημερομηνία και ώρες, τοποθεσία, % μπαταρίας αρχής/τέλους, kWh από τον φορτιστή (<b>Kwh real</b>) και kWh που μπήκαν στη μπαταρία (<b>kwh car</b>), AC/DC, τιμή, κόστος και χιλιόμετρα.</p>
+<div class="grid2">
+  <div class="card"><h4>Ένα αρχείο δεδομένων</h4><p><code>tesla-data.json</code> στον φάκελο «Tesla kWh δεδομένα» του Google Drive. Το διαβάζουν και το γράφουν το Mac και το iPhone.</p></div>
+  <div class="card"><h4>Τρεις πηγές</h4><p>Ό,τι γράφεις εσύ, το CSV του TeslaFi, και η Tesla (Supercharger, ζωντανή κατάσταση).</p></div>
+  <div class="card"><h4>Τίποτα δεν αλλάζει μόνο του</h4><p>Κάθε εισαγωγή ή διόρθωση σού δείχνει πρώτα προεπισκόπηση. Αλλάζει μόνο ό,τι τσεκάρεις εσύ.</p></div>
+  <div class="card"><h4>Λειτουργεί και χωρίς σύνδεση</h4><p>Στο iPhone, χωρίς ίντερνετ, οι νέες φορτίσεις μπαίνουν σε ουρά και στέλνονται όταν ξανασυνδεθείς.</p></div>
+</div>
+</section>
+
+<section id="devices">
+<h2><span class="n">2</span>Mac, iPhone, browser</h2>
+<h3>Mac</h3>
+<ul>
+  <li>Η εφαρμογή είναι στο <code>~/Applications/Tesla kWh/Tesla kWh.app</code>. Κράτησέ την στο Dock (δεξί κλικ → Επιλογές → Διατήρηση στο Dock).</li>
+  <li>Την <b>πρώτη φορά</b> που την ανοίγεις, ή μετά από ενημέρωση, το macOS μπορεί να ρωτήσει «από άγνωστο προγραμματιστή». Κάνε <b>δεξί κλικ → Άνοιγμα</b> και επιβεβαίωσε.</li>
+  <li>Στο Mac τα δεδομένα γράφονται απευθείας στο αρχείο του Google Drive, και το Google Drive τα συγχρονίζει.</li>
+  <li>Για να κλείσεις την εφαρμογή πάτα <kbd>⌘Q</kbd>. Κλείνει και ο μικρός τοπικός server που τρέχει από πίσω.</li>
+</ul>
+<div class="warn"><b>Μην την ανοίγεις από το OneDrive</b>Ο φάκελος «εφαρμογή-Mac (πρωτότυπο…)» στο OneDrive είναι αντίγραφο φύλαξης. Το macOS δεν επιτρέπει σε εφαρμογή μέσα στο OneDrive να διαβάσει αρχεία, οπότε άνοιγε πάντα αυτή στο <code>~/Applications</code>.</div>
+
+<h3>iPhone</h3>
+<ol class="steps">
+  <li>Στο <b>Safari</b> άνοιξε τη διεύθυνση της εφαρμογής στο GitHub Pages (<code>nikmatz.github.io/tesla-kwh</code>).</li>
+  <li>Πάτα <b>Κοινή χρήση</b> (το τετράγωνο με το βέλος) → <b>Προσθήκη στην οθόνη Αφετηρίας</b>. Από εκεί ανοίγει πλέον σαν κανονική εφαρμογή.</li>
+  <li>Στις <b>Ρυθμίσεις → Σύνδεση με Google Drive</b> βάλε τη διεύθυνση (URL) της γέφυρας και το κλειδί, μία φορά. Τα κρατά μόνο αυτή η συσκευή.</li>
+</ol>
+<p>Η ένδειξη πάνω δεξιά δείχνει πού βρίσκεται η εφαρμογή: <b>τοπικό αρχείο</b> (Mac), <b>Google Drive</b> (iPhone/browser με γέφυρα), ή <b>χωρίς σύνδεση</b> (προβολή από την τελευταία φορά, με νέες φορτίσεις σε ουρά).</p>
+</section>
+
+<section id="entry">
+<h2><span class="n">3</span>Νέα φόρτιση</h2>
+<p>Στην καρτέλα <b>Καταχώρηση</b> συμπληρώνεις τη φόρμα και πατάς <span class="btnlike">Αποθήκευση</span> ή <kbd>Enter</kbd>.</p>
+<div class="scroll"><table>
+<tr><th>Πεδίο</th><th>Τι γράφεις</th></tr>
+<tr><td>Ημερομηνία, Έναρξη, Λήξη</td><td>Αν βάλεις και τις δύο ώρες, η διάρκεια υπολογίζεται μόνη της. Περνά και τα μεσάνυχτα.</td></tr>
+<tr><td>Τοποθεσία</td><td>Διαλέγεις από τη λίστα. Με «+ νέα τοποθεσία…» φτιάχνεις καινούργια. Η τοποθεσία φέρνει αυτόματα την τιμή της περιόδου και AC/DC.</td></tr>
+<tr><td>% αρχή / % τέλος</td><td>Το ποσοστό της μπαταρίας.</td></tr>
+<tr><td><b>Kwh real</b></td><td>Η ένδειξη του φορτιστή ή του μετρητή, δηλαδή η ενέργεια που πλήρωσες.</td></tr>
+<tr><td><b>kwh car</b></td><td>Η ενέργεια που μπήκε στη μπαταρία, από το αυτοκίνητο ή το TeslaFi. Αν λείπει, προτείνεται από τη συνηθισμένη απόδοση της τοποθεσίας.</td></tr>
+<tr><td>Ρεύμα, Τιμολόγιο</td><td>AC/DC και Νύχτα/Ημέρα, αν η τοποθεσία έχει νυχτερινή τιμή.</td></tr>
+<tr><td>Τιμή €/kWh, Κόστος €</td><td>Συμπληρώνεται το ένα από το άλλο. <b>Αν γράψεις μόνο το ποσό</b> που πλήρωσες, η τιμή €/kWh βγαίνει μόνη της.</td></tr>
+<tr><td>Χιλιόμετρα</td><td>Το κοντέρ. Το πεδίο δείχνει ως υπόδειξη το τελευταίο γνωστό.</td></tr>
+<tr><td>Δωρεάν χιλιόμετρα Tesla</td><td>Για Supercharger με credits. Κόστος 0, και η εγγραφή πάει στην τοποθεσία «Tesla SuperCharger Free».</td></tr>
+</table></div>
+<ul>
+  <li><span class="btnlike">Όπως η τελευταία</span> συμπληρώνει τοποθεσία, ρεύμα, τιμολόγιο και τιμή όπως στην προηγούμενη φόρτιση. Βάζει επίσης ως % αρχής το % τέλους της προηγούμενης.</li>
+  <li>Αν η φόρτιση μοιάζει πολύ με κάποια που υπάρχει ήδη (ίδια τοποθεσία, ±1 μέρα, ίδια kWh ή ίδια %), θα σε ρωτήσει πριν την αποθηκεύσει.</li>
+  <li>Στη λίστα «Τελευταίες φορτίσεις» κλικ σε μια γραμμή την ανοίγει για διόρθωση. Το <b>×</b> τη διαγράφει, αφού επιβεβαιώσεις.</li>
+</ul>
+</section>
+
+<section id="live">
+<h2><span class="n">4</span>Από την Tesla, ζωντανά</h2>
+<p>Πάνω από τη φόρμα υπάρχουν τρία κουμπιά. Εμφανίζονται όταν έχει γίνει η «Σύνδεση με Google Drive» στις Ρυθμίσεις.</p>
+<div class="scroll"><table>
+<tr><th>Κουμπί</th><th>Τι κάνει</th></tr>
+<tr><td><span class="btnlike">⚡ Τώρα από Tesla</span></td><td>Δείχνει την κατάσταση: μπαταρία και όριο, αν φορτίζει και με πόση ισχύ, kWh αυτής της φόρτισης, χρόνο που απομένει, κοντέρ, αυτονομία, θερμοκρασία, τοποθεσία. Αν το αυτοκίνητο κοιμάται, το ξυπνά (έως ~30″).</td></tr>
+<tr><td><span class="btnlike">▶ Έναρξη φόρτισης</span></td><td>Το πατάς όταν βάζεις το καλώδιο. Γράφει ημερομηνία, ώρα, % αρχής, κοντέρ και τοποθεσία, και <b>ξεκινά την παρακολούθηση</b>.</td></tr>
+<tr><td><span class="btnlike">■ Τέλος τώρα</span></td><td>Κλείνει τη φόρτιση με το χέρι, με τα τρέχοντα στοιχεία. Χρήσιμο αν δεν θέλεις να περιμένεις την παρακολούθηση.</td></tr>
+</table></div>
+<h3>Η παρακολούθηση</h3>
+<ol class="steps">
+  <li>Μετά την «Έναρξη», η γέφυρα στο Google κοιτάζει κάθε 10′ <b>αν το αυτοκίνητο είναι ήδη ξύπνιο</b>. Αυτός ο έλεγχος δεν το ξυπνά. Όσο φορτίζει είναι ξύπνιο από μόνο του, οπότε διαβάζει την πρόοδο.</li>
+  <li>Αν έχεις προγραμματισμένη (νυχτερινή) φόρτιση, περιμένει να ξεκινήσει.</li>
+  <li>Μόλις η φόρτιση τελειώσει, η παρακολούθηση σταματά μόνη της. Σταματά σε κάθε περίπτωση μετά από 24 ώρες.</li>
+  <li>Όταν ανοίξεις την εφαρμογή, Mac ή iPhone, βλέπεις «<b>Η φόρτιση τελείωσε</b> · 41% → 80% · +22,6 kWh» με το κουμπί <span class="btnlike">Συμπλήρωση στη φόρμα</span>.</li>
+  <li>Ελέγχεις, διορθώνεις το <b>Kwh real</b> αν ξέρεις την ένδειξη του φορτιστή, πατάς <span class="btnlike">Αποθήκευση</span> και <b>επιβεβαιώνεις</b>.</li>
+</ol>
+<div class="note"><b>Τι δεν δίνει η Tesla</b>Η Tesla ξέρει πόσα kWh μπήκαν στη μπαταρία, όχι τι μέτρησε ο φορτιστής. Γι' αυτό το Kwh real βγαίνει ως <i>εκτίμηση</i>, από τη διάμεση απόδοση των φορτίσεών σου σε εκείνη την τοποθεσία, και σημειώνεται στη φόρμα.</div>
+<ul>
+  <li><b>Τοποθεσία:</b> την πρώτη φορά σε ένα σημείο τη διαλέγεις εσύ. Η εφαρμογή θυμάται το στίγμα και την επόμενη φορά την αναγνωρίζει μόνη της (σε ακτίνα 250 m). Σε Supercharger βάζει «Tesla SuperCharger».</li>
+  <li><b>Έναρξη στο iPhone, τέλος στο Mac:</b> η φόρτιση σε εξέλιξη κρατιέται στο αρχείο δεδομένων, οπότε τη βλέπουν όλες οι συσκευές.</li>
+  <li><b>Αυτονομία στο 100%:</b> αν η φόρτιση τελειώσει στο 100%, κρατιέται και η αυτονομία που δίνει το BMS. Είναι ο πιο «καθαρός» δείκτης υγείας μπαταρίας (δες <a href="#battery">§7</a>).</li>
+  <li><b>Ακύρωση:</b> το «ακύρωση» δίπλα στη φόρτιση σε εξέλιξη σταματά και την παρακολούθηση.</li>
+</ul>
+</section>
+
+<section id="log">
+<h2><span class="n">5</span>Ημερολόγιο</h2>
+<ul>
+  <li><b>Φίλτρα</b> ανά έτος, μήνα, τοποθεσία, κατηγορία (δωρεάν, σπίτι, Supercharger, αλλού) και κείμενο.</li>
+  <li><b>Ταξινόμηση</b> με κλικ στην κεφαλίδα κάθε στήλης. Η στήλη <i>battery</i> δείχνει την εκτίμηση χωρητικότητας κάθε φόρτισης. Σε μικρό Δ% εμφανίζεται αχνή, γιατί είναι αναξιόπιστη.</li>
+  <li><b>Σήματα:</b> <i>≈</i> σημαίνει εκτιμώμενο κόστος, <i>ημιτελής</i> ότι λείπουν % ή kWh, <i>υποθετική</i> ότι πρόκειται για εκτίμηση κενού.</li>
+  <li><b>Κουμπί «Κόστη»:</b> λίστα με όσα έχουν εκτίμηση ή δεν έχουν κόστος, για να βάλεις πραγματικά ποσά.</li>
+  <li><b>Κουμπί «Διπλοεγγραφές»:</b> βρίσκει ζεύγη που μοιάζουν (ίδια μέρα και kWh ή ίδια %) και σε αφήνει να διαλέξεις ποιο κρατάς.</li>
+  <li><b>Εξαγωγή</b> σε CSV, ή σε Excel (.xlsx) από το Mac, με όλες τις στήλες και τα υπολογισμένα πεδία.</li>
+</ul>
+</section>
+
+<section id="summary">
+<h2><span class="n">6</span>Σύνοψη</h2>
+<ul>
+  <li><b>Κατανάλωση kWh/100 km:</b> kWh που μπήκαν στη μπαταρία ÷ χιλιόμετρα του κοντέρ, μείον όση ενέργεια είναι ακόμη μέσα στη μπαταρία. Δίπλα φαίνεται και «από τον φορτιστή», που περιλαμβάνει τις απώλειες φόρτισης.</li>
+  <li><b>Κόστος €/100 km</b>, μέση τιμή €/kWh, απόδοση φόρτισης (kwh car ÷ Kwh real).</li>
+  <li><b>Από πού ήρθαν τα kWh:</b> δωρεάν, σπίτι, Supercharger, αλλού, και AC/DC.</li>
+  <li><b>Ανά μήνα</b> (kWh, €, πλήθος) και <b>ανά έτος</b> (km, κατανάλωση, €/100 km, μπαταρία, εξοικονόμηση έναντι βενζίνης).</li>
+  <li><b>Σύγκριση με βενζίνη:</b> km κάθε έτους × λίτρα/100 km × <b>μέση τιμή αμόλυβδης εκείνου του έτους</b> − κόστος ρεύματος. Η κατανάλωση και οι τιμές αλλάζουν στις Ρυθμίσεις.</li>
+  <li><b>Δωρεάν χιλιόμετρα Tesla:</b> πλήθος, kWh και ενδεικτική αξία τους.</li>
+</ul>
+</section>
+
+<section id="battery">
+<h2><span class="n">7</span>Υγεία μπαταρίας (LFP)</h2>
+<p>Η μπαταρία LFP έχει σχεδόν <b>επίπεδη καμπύλη τάσης</b>, περίπου 3,2–3,3 V ανά κελί από 10% ως 90%. Το BMS δεν μπορεί να καταλάβει το % από την τάση, οπότε μετρά ρεύμα, και η μέτρηση σιγά-σιγά «γλιστρά». Μόνο κοντά στο <b>100%</b>, όπου η τάση ανεβαίνει απότομα, ξαναβαθμονομείται. Γι' αυτό η Tesla συστήνει 100% τουλάχιστον μία φορά την εβδομάδα στις LFP.</p>
+<h3>Πώς υπολογίζει η εφαρμογή</h3>
+<ol>
+  <li>Χωρητικότητα μιας φόρτισης = <code>kwh car ÷ (Δ% / 100)</code>.</li>
+  <li>Για την κύρια εκτίμηση χρησιμοποιούνται <b>μόνο φορτίσεις που τελείωσαν στο 100%</b>, με Δ% ≥ 30.</li>
+  <li>Η <b>τάση</b> στον χρόνο υπολογίζεται με τη μέθοδο Theil–Sen (διάμεση κλίση), που αγνοεί τις λίγες ακραίες τιμές, π.χ. φορτίσεις με θέρμανση μπαταρίας τον χειμώνα.</li>
+  <li>Η σύγκριση γίνεται με τη <b>δική σου αρχή</b> και όχι με τα ονομαστικά 60,5 kWh. Τα «kWh που μπήκαν» έχουν μια σταθερή μικρή μετατόπιση, αλλά η σχετική μεταβολή είναι αξιόπιστη.</li>
+  <li>Δεύτερη, ανεξάρτητη ένδειξη είναι η <b>αυτονομία στο 100%</b> που υπολογίζει το ίδιο το BMS: από το TeslaFi (Range Added ÷ Δ%) και από τις ζωντανές φορτίσεις που τελειώνουν στο 100%.</li>
+</ol>
+<p>Στο γράφημα «Εκτίμηση μπαταρίας», η επιλογή <b>στο 100%</b> δείχνει τις βαθμονομημένες φορτίσεις με τη γραμμή τάσης. Η επιλογή <b>όλες</b> δείχνει και τις υπόλοιπες ως άδειους κύκλους, για να φαίνεται η διαφορά.</p>
+<div class="tip"><b>Για καλύτερη εκτίμηση</b>Μία φόρτιση στο 100% την εβδομάδα (ή πριν από ταξίδι), ξεκινώντας κάτω από 60%, δίνει τα καλύτερα σημεία.</div>
+</section>
+
+<section id="import">
+<h2><span class="n">8</span>Εισαγωγή δεδομένων</h2>
+<h3>Από το TeslaFi (CSV)</h3>
+<ol class="steps">
+  <li>Στο TeslaFi: <b>Charges</b> → διάλεξε ημερομηνίες → <b>Download</b>. Η εφαρμογή σού γράφει από ποια ημερομηνία να κατεβάσεις.</li>
+  <li>Σύρε το αρχείο στο πλαίσιο «Εισαγωγή από TeslaFi».</li>
+  <li>Στην προεπισκόπηση αντιστοίχισε κάθε διεύθυνση του TeslaFi σε τοποθεσία. Την επόμενη φορά τις θυμάται.</li>
+  <li>Οι διπλές (ίδιος αριθμός φόρτισης, ή ίδια μέρα και kWh), οι μηδενικές και οι χειρόγραφες του TeslaFi δεν τσεκάρονται. Πάτα <span class="btnlike">Εισαγωγή</span>.</li>
+</ol>
+<h3>Από την Tesla (Supercharger)</h3>
+<p>Το κουμπί <span class="btnlike">Έλεγχος στην Tesla</span> φέρνει όλο το ιστορικό Supercharger του λογαριασμού σου και το συγκρίνει με τις εγγραφές:</p>
+<ul>
+  <li><b>Για τα Supercharger υπερισχύει η Tesla:</b> αν ήταν δωρεάν ή όχι, το ποσό σε € και τα kWh του φορτιστή. Η παλιά τιμή γράφεται στη σημείωση.</li>
+  <li><b>Χωρίς διπλές εγγραφές:</b> κάθε φόρτιση της Tesla έχει μόνιμο αριθμό που γράφεται στην εγγραφή. Όσες έχουν ήδη περαστεί βγαίνουν «ίδια». Νέες αντιστοιχίζονται με την ώρα έναρξης (±20′). Όταν το TeslaFi έχει γράψει δύο συνεδρίες της Tesla σε μία, ενώνονται.</li>
+  <li><b>«kWh ≠»:</b> όταν τα kWh διαφέρουν πάνω από 15%, η γραμμή μένει αποεπιλεγμένη για να την κοιτάξεις.</li>
+  <li><b>Ξένα νομίσματα</b> (CHF, CZK…) μετατρέπονται σε € με ενδεικτική ισοτιμία. Το αρχικό ποσό γράφεται στη σημείωση.</li>
+  <li>Οι δωρεάν φορτίσεις (credits, δωρεάν σταθμοί) πάνε στην τοποθεσία «Tesla SuperCharger Free».</li>
+</ul>
+<h3>Κόστη από αρχείο</h3>
+<p>Οποιοδήποτε CSV με στήλες <b>ημερομηνία</b>, <b>kWh</b> και <b>ποσό</b>. Κάθε γραμμή ταιριάζει με φόρτιση της ίδιας μέρας (±1) με παρόμοια kWh.</p>
+</section>
+
+<section id="settings">
+<h2><span class="n">9</span>Ρυθμίσεις & τιμές</h2>
+<ul>
+  <li><b>Αυτοκίνητο, χωρητικότητα</b> (ονομαστική 60,5 / ωφέλιμη 57 kWh), <b>τρέχοντα km και %</b>. Κενά σημαίνουν ότι παίρνονται από την τελευταία φόρτιση.</li>
+  <li><b>Σύγκριση με βενζίνη:</b> λίτρα/100 km του βενζινοκίνητου με το οποίο συγκρίνεις, και <b>τιμή αμόλυβδης ανά έτος</b>, γραμμένη ως <code>2024: 1,855 · 2025: 1,761 · 2026: 1,981</code>. Αν λείπει ένα έτος, χρησιμοποιείται το προηγούμενο.</li>
+  <li><b>Τοποθεσίες:</b> κατηγορία, AC/DC και <b>τιμές ανά περίοδο</b>, π.χ. Home 0,16 → 0,19 → 0,20 €/kWh. Από τη ρύθμιση τιμών μπορείς να <b>ξαναϋπολογίσεις</b> το κόστος σε ένα διάστημα. Εγγραφές με επιβεβαιωμένο κόστος, όπως Excel, Tesla ή ποσό που έγραψες εσύ, <b>δεν αλλάζουν ποτέ</b>.</li>
+  <li><b>Σύνδεση με Google Drive:</b> η διεύθυνση και το κλειδί της γέφυρας. Χρειάζεται στο iPhone και, στο Mac, για τα κουμπιά της Tesla.</li>
+  <li><b>Θέμα:</b> αυτόματο, φωτεινό ή σκοτεινό.</li>
+</ul>
+</section>
+
+<section id="rules">
+<h2><span class="n">10</span>Κανόνες δεδομένων</h2>
+<ul>
+  <li><b>Μέχρι 31/01/2026 το Excel είναι η αλήθεια.</b> Οι φορτίσεις του και τα ποσά του κρατήθηκαν ακριβώς. Το TeslaFi συμπλήρωσε μόνο ό,τι έλειπε, όπως ώρες και διορθώσεις τυπογραφικών στα %.</li>
+  <li><b>Για τα Supercharger υπερισχύει η Tesla</b>, για όλη την περίοδο.</li>
+  <li>Η παύλα «–» ή το 0 στο κόστος Supercharger του Excel σημαίνει <b>δωρεάν</b> (credits). Ο <b>Δήμος Αθηναίων</b> είναι πάντα 0 €.</li>
+  <li><b>Τίποτα παλιό δεν αλλάζει αυτόματα.</b> Κάθε εισαγωγή ή ενημέρωση προτείνει, και εσύ επιλέγεις.</li>
+  <li>Οι <b>υποθετικές</b> εγγραφές καλύπτουν κενά χωρίς καμία πηγή, π.χ. Home 15/03/2026 για το διάστημα 14/02–12/04/2026. Είναι σημειωμένες και μπορείς να τις διορθώσεις ή να τις σβήσεις.</li>
+</ul>
+</section>
+
+<section id="backups">
+<h2><span class="n">11</span>Αντίγραφα ασφαλείας</h2>
+<ul>
+  <li>Σε κάθε αποθήκευση από το Mac κρατιέται αντίγραφο στο <code>Tesla kWh δεδομένα/backups</code>, το πολύ ένα ανά 10′ και τα 40 πιο πρόσφατα. Από τη γέφυρα (iPhone) τα αντίγραφα μπαίνουν στον φάκελο <code>backups</code> του Drive.</li>
+  <li>Το Google Drive κρατά επίσης δικό του ιστορικό εκδόσεων για κάθε αρχείο: δεξί κλικ → Διαχείριση εκδόσεων.</li>
+  <li><b>Εισαγωγή → Αντίγραφα ασφαλείας:</b> «Λήψη αντιγράφου (JSON)» και «Επαναφορά από JSON».</li>
+  <li>Αν δύο συσκευές γράψουν ταυτόχρονα, η δεύτερη παίρνει ειδοποίηση και ξαναφορτώνει. Δεν χάνεται τίποτα σιωπηλά.</li>
+</ul>
+</section>
+
+<section id="trouble">
+<h2><span class="n">12</span>Προβλήματα & λύσεις</h2>
+<details><summary>Το Mac γράφει «ο server δεν απάντησε» ή δεν βλέπω δεδομένα</summary><p>Κλείσε με <kbd>⌘Q</kbd> και άνοιξε ξανά από το <code>~/Applications/Tesla kWh</code>, όχι από το OneDrive. Βεβαιώσου ότι το Google Drive τρέχει και ότι υπάρχει το <code>tesla-data.json</code> στον φάκελο «Tesla kWh δεδομένα». Αν το αρχείο λείπει, η εφαρμογή <b>αρνείται</b> να γράψει, για να μη δημιουργήσει άδειο αρχείο.</p></details>
+<details><summary>«από άγνωστο προγραμματιστή» στο άνοιγμα</summary><p>Δεξί κλικ στην εφαρμογή → <b>Άνοιγμα</b> → Άνοιγμα. Αρκεί μία φορά μετά από κάθε ενημέρωση.</p></details>
+<details><summary>«Το Apps Script είναι παλιά έκδοση»</summary><p>Βάλε τον νέο <code>Code.gs</code> στο Apps Script, πάτα Deploy → Manage deployments → ✎ → <b>New version</b> → Deploy. Η διεύθυνση δεν αλλάζει. Δες την <a href="docs.html#update">Τεκμηρίωση</a>.</p></details>
+<details><summary>«Το αυτοκίνητο δεν απαντά»</summary><p>Είναι σε βαθύ ύπνο ή χωρίς σήμα, π.χ. σε υπόγειο. Δοκίμασε ξανά σε λίγο ή άνοιξε πρώτα την εφαρμογή της Tesla στο κινητό.</p></details>
+<details><summary>Δεν έρχεται τοποθεσία</summary><p>Χρειάζεται η άδεια «Τοποθεσία οχήματος» και στο developer.tesla.com και στη σύνδεση με την Tesla. Ξανακάνε μία φορά τη σύνδεση (login) με όλες τις άδειες τσεκαρισμένες.</p></details>
+<details><summary>Το iPhone δείχνει «χωρίς σύνδεση»</summary><p>Έλεγξε ότι έχεις ίντερνετ και ότι οι Ρυθμίσεις → Σύνδεση με Google Drive έχουν σωστή διεύθυνση και κλειδί. Οι φορτίσεις που έγραψες στο μεταξύ στέλνονται μόλις συνδεθεί.</p></details>
+</section>
+
+<section id="security">
+<h2><span class="n">13</span>Ασφάλεια</h2>
+<ul>
+  <li>Η εφαρμογή <b>μόνο διαβάζει</b> από το αυτοκίνητο. Δεν στέλνει εντολές: ούτε ξεκλείδωμα, ούτε εκκίνηση, ούτε κλιματισμό. Ένα Model 3 του 2024 εκτελεί εντολές από εφαρμογή τρίτου μόνο αν έχεις εγκαταστήσει στο αυτοκίνητο το «virtual key» της εφαρμογής, κάτι που <b>δεν χρειάζεται και δεν πρέπει</b> να κάνεις.</li>
+  <li>Στο GitHub υπάρχουν μόνο η εφαρμογή και το <b>δημόσιο</b> κλειδί. Η διεύθυνση της γέφυρας, το κλειδί της και τα δεδομένα δεν ανεβαίνουν ποτέ εκεί.</li>
+  <li><b>Μην ανεβάσεις ποτέ</b> στο GitHub τον φάκελο <code>apps-script</code> ή το <code>tesla-data.json</code>.</li>
+  <li>Ό,τι κι αν γίνει, κόβεις την πρόσβαση με ένα κλικ: στον λογαριασμό σου στο tesla.com, στις εφαρμογές τρίτων, αφαιρείς το «nikmatz kWh Log».</li>
+</ul>
+</section>
+
+<section id="faq">
+<h2><span class="n">14</span>Συχνές ερωτήσεις</h2>
+<details><summary>Μπορώ να τραβάω από την Tesla και τις φορτίσεις στο σπίτι;</summary><p>Όχι ως ιστορικό. Η Tesla κρατά ιστορικό μόνο για τα Supercharger. Για το σπίτι υπάρχουν τα κουμπιά «Έναρξη φόρτισης» και παρακολούθηση, ή το CSV του TeslaFi.</p></details>
+<details><summary>Κοστίζει η σύνδεση με την Tesla;</summary><p>Η Tesla χρεώνει ανά ερώτημα, αλλά δίνει 10 $ τον μήνα δωρεάν σε ιδιώτες. Η χρήση της εφαρμογής, δηλαδή λίγα ερωτήματα ανά φόρτιση χωρίς να ξυπνά το αυτοκίνητο, είναι πολύ μέσα σε αυτό το όριο.</p></details>
+<details><summary>Γιατί το Kwh real είναι μεγαλύτερο από το kwh car;</summary><p>Λόγω απωλειών φόρτισης (μετατροπή AC→DC, ψύξη/θέρμανση μπαταρίας). Συνήθως 5–12% στο AC και λιγότερο στο DC.</p></details>
+<details><summary>Χάνονται δεδομένα αν σβήσω κάτι κατά λάθος;</summary><p>Υπάρχουν τα αντίγραφα στο <code>backups</code> και το ιστορικό εκδόσεων του Google Drive. Επαναφορά γίνεται από Εισαγωγή → Επαναφορά από JSON.</p></details>
+</section>
+
+<footer>Tesla kWh by nikmatz@ · Οδηγός χρήσης · <a href="docs.html">Τεκμηρίωση</a> · <a href="./">Εφαρμογή</a></footer>
+</main>
+</div>
+<script>try{const t=JSON.parse(localStorage.getItem('tesla-kwh-cache')||'null'); const th=t&&t.settings&&t.settings.theme; if(th==='dark'||th==='light') document.documentElement.dataset.theme=th;}catch(e){}</script>
+</body>
+</html>
