@@ -169,6 +169,11 @@ table.mini tr:last-child td{border-bottom:0}
 .drop input{display:none}
 .maprow{display:grid;grid-template-columns:minmax(0,1fr) 220px 90px;gap:10px;align-items:center;padding:6px 0;border-bottom:1px solid var(--line);font-size:13.5px}
 .maprow select{padding:6px 8px;border:1px solid var(--line-strong);border-radius:8px;background:var(--surface)}
+.tlive{margin:0 0 14px;padding:10px 12px;border:1px solid var(--line, #e5e5e5);border-radius:10px;background:var(--surface-2)}
+.tl-btns{display:flex;flex-wrap:wrap;gap:8px}
+.tl-card{font-size:13px;color:var(--muted);margin-top:8px;line-height:1.5}
+.tl-card:empty{display:none}
+.tl-card b{color:var(--text, inherit)}
 .pill{display:inline-block;padding:2px 8px;border-radius:999px;background:var(--surface-2);font-size:12px;color:var(--muted)}
 .pill.ok{background:#E3F4EA;color:#1F7A4D}
 .pill.dup{background:#FDEBD0;color:#8A5A00}
@@ -224,7 +229,10 @@ code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12.5px;ba
   <div class="grid-entry">
     <div class="panel">
       <div class="ph"><h2>Νέα φόρτιση</h2><span class="kbd">Enter = αποθήκευση</span></div>
-      <div class="pb"><form id="entryForm" autocomplete="off"></form></div>
+      <div class="pb"><div class="tlive" id="tlive" style="display:none">
+        <div class="tl-btns"><button class="btn" type="button" id="tlNow" title="Ζωντανή κατάσταση μπαταρίας και φόρτισης">⚡ Τώρα από Tesla</button><button class="btn" type="button" id="tlStart" title="Γράφει ημερομηνία, ώρα, % αρχής, κοντέρ και τοποθεσία">▶ Έναρξη από Tesla</button><button class="btn" type="button" id="tlEnd" title="Συμπληρώνει λήξη, % τέλους, kWh μπαταρίας — μετά πατάς Αποθήκευση">■ Τέλος από Tesla</button></div>
+        <div class="tl-card" id="tlCard"></div>
+      </div><form id="entryForm" autocomplete="off"></form></div>
     </div>
     <div class="panel">
       <div class="ph"><h2>Τελευταίες φορτίσεις</h2><a href="#log" class="muted" style="font-size:13px">όλες</a></div>
@@ -302,6 +310,17 @@ code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12.5px;ba
       </div>
     </div>
     <div class="panel">
+      <div class="ph"><h2>Από την Tesla (Supercharger)</h2><span class="muted" id="tsState"></span></div>
+      <div class="pb">
+        <p class="help">Προαιρετικό. Διαβάζει από τον λογαριασμό σου στην Tesla το ιστορικό φορτίσεων Supercharger με τα πραγματικά ποσά και σου προτείνει διορθώσεις: για τα Supercharger υπερισχύει η Tesla (δωρεάν ή όχι, ποσό σε €, kWh φορτιστή), και φορτίσεις που λείπουν. Τίποτα δεν αλλάζει αν δεν το τσεκάρεις. Ξένα νομίσματα μετατρέπονται σε € με ενδεικτική ισοτιμία. Χρειάζεται τη «Σύνδεση με Google Drive» (Ρυθμίσεις) και μία φορά «Σύνδεση με Tesla».</p>
+        <div class="form-grid" style="grid-template-columns:repeat(3,minmax(0,1fr));max-width:560px">
+          <div class="field"><label>Από ημερομηνία</label><input type="date" id="tsFrom" value="2024-01-01"></div>
+          <div class="field"><label>&nbsp;</label><button class="btn primary" id="tsCheck">Έλεγχος στην Tesla</button></div>
+          <div class="field"><label>&nbsp;</label><button class="btn" id="tsLogin">Σύνδεση με Tesla</button></div>
+        </div>
+      </div>
+    </div>
+    <div class="panel">
       <div class="ph"><h2>Εισαγωγή κόστους από αρχείο</h2></div>
       <div class="pb">
         <p class="help">Για τα πραγματικά ποσά των Supercharger: οποιοδήποτε CSV με στήλες <b>ημερομηνία</b>, <b>kWh</b> και <b>ποσό</b> (π.χ. ό,τι εξάγει το Tesla app ή ένα φύλλο που φτιάχνεις από τις αποδείξεις). Κάθε γραμμή ταιριάζεται με φόρτιση της ίδιας ημέρας (±1) και παρόμοιων kWh και της βάζει το ποσό.</p>
@@ -319,6 +338,11 @@ code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12.5px;ba
         <p class="help" style="margin-top:14px" id="storageInfo"></p>
       </div>
     </div>
+  </div>
+  <div class="panel" id="teslaPanel" style="margin-top:18px;display:none">
+    <div class="ph"><h2>Tesla — προτάσεις</h2><span class="muted" id="tsStats"></span></div>
+    <div class="pb"><div class="actions" style="margin-top:0"><button class="btn primary" id="tsApply">Εφαρμογή επιλεγμένων</button><button class="btn" id="tsClose">Κλείσιμο</button></div></div>
+    <div class="table-wrap"><table class="log" id="tsTable"></table></div>
   </div>
   <div class="panel" id="costImportPanel" style="margin-top:18px;display:none">
     <div class="ph"><h2 id="costImportTitle">Κόστη — προεπισκόπηση</h2><span class="muted" id="costImportStats"></span></div>
@@ -420,7 +444,7 @@ code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12.5px;ba
 
 <script>
 /* ===================== utilities ===================== */
-const APP_VERSION = '1.5 · 28/10/2026';
+const APP_VERSION = '1.8 · 28/10/2026';
 const $ = (s, el=document) => el.querySelector(s);
 const $$ = (s, el=document) => [...el.querySelectorAll(s)];
 const isNum = v => typeof v === 'number' && isFinite(v);
@@ -666,7 +690,7 @@ function renderEntry(){
     wireForm('e_'); f.dataset.ready='1';
     // remember last location as a convenience
     const last=[...S.records].sort(cmpRec).slice(-1)[0]; if(last){ $('#e_loc').value=last.location; $('#e_loc').dispatchEvent(new Event('change')); }
-    f.addEventListener('submit',ev=>{ ev.preventDefault(); try{ const r=readForm('e_'); if(!confirmNotDuplicate(r)) return; addRecord(r); if(Store.mode!=='offline') toast('Αποθηκεύτηκε'); resetEntry(r.location); }catch(e){ toast(e.message,true); } });
+    f.addEventListener('submit',ev=>{ ev.preventDefault(); try{ const r=readForm('e_'); if(!confirmNotDuplicate(r)) return; if(f.dataset.tesla==='1'){ r.flags=[...new Set([...(r.flags||[]),'tesla_live'])]; } addRecord(r); if(f.dataset.tesla==='1') tlAfterSave(r); if(Store.mode!=='offline') toast('Αποθηκεύτηκε'); resetEntry(r.location); }catch(e){ toast(e.message,true); } });
     $('#e_reset').addEventListener('click',()=>resetEntry());
     $('#e_last').addEventListener('click',()=>{ const last=[...S.records].sort(cmpRec).slice(-1)[0]; if(!last){ toast('Δεν υπάρχει προηγούμενη φόρτιση.',true); return; }
       $('#e_loc').value=last.location; $('#e_loc').dispatchEvent(new Event('change')); if(last.current) setSeg('e_cur',last.current); if(last.tariff) setSeg('e_tar',last.tariff);
@@ -674,7 +698,7 @@ function renderEntry(){
       if(isNum(last.pct_end)) $('#e_p0').value=String(+last.pct_end.toFixed(1)); recalcCost('e_'); $('#e_p1').focus(); });
     f.addEventListener('keydown',ev=>{ if(ev.key==='Enter'&&ev.target.tagName==='INPUT'){ ev.preventDefault(); f.requestSubmit(); } });
   }
-  renderRecent();
+  tlShow(); renderRecent();
 }
 function resetEntry(keepLoc){ const f=$('#entryForm'); f.innerHTML=''; f.dataset.ready=''; renderEntry(); if(keepLoc){ $('#e_loc').value=keepLoc; $('#e_loc').dispatchEvent(new Event('change')); } $('#e_p0').focus(); }
 function findSimilar(r, excludeId){
@@ -767,6 +791,129 @@ function renderLog(){
   if(!rs.length) $('#logTable').innerHTML=head+`<tbody><tr><td colspan="${LOG_COLS.length}" class="empty">Καμία φόρτιση για αυτά τα φίλτρα.</td></tr></tbody>`;
 }
 ['fYear','fMonth','fLoc','fCat','fText'].forEach(id=>$('#'+id).addEventListener('input',renderLog));
+
+/* ===================== Tesla Fleet API (through the Apps Script bridge) ===================== */
+let tsState=null;
+async function tsRefreshState(){ const el=$('#tsState'); if(!el) return; if(!Remote.cfg()){ el.textContent='χωρίς σύνδεση Google Drive'; return; } try{ const j=await Remote.get('status'); el.textContent = j.tesla ? 'συνδεδεμένο με Tesla' : (/^drive-[2-9]/.test(j.version||'') ? 'όχι ακόμη συνδεδεμένο με Tesla' : 'ενημέρωσε το Apps Script'); }catch(e){ el.textContent=''; } }
+$('#tsLogin').addEventListener('click',()=>{ const c=Remote.cfg(); if(!c){ toast('Πρώτα: Ρυθμίσεις → Σύνδεση με Google Drive.', true); return; } const u=new URL(c.url); u.searchParams.set('key',c.key); u.searchParams.set('action','tesla_login'); window.open(u.toString(),'_blank'); });
+$('#tsCheck').addEventListener('click', async ()=>{
+  if(!Remote.cfg()){ toast('Πρώτα: Ρυθμίσεις → Σύνδεση με Google Drive.', true); return; }
+  const from=$('#tsFrom').value; $('#tsCheck').disabled=true; $('#tsCheck').textContent='Ρωτάω την Tesla…';
+  try{ const st=await Remote.get('status'); const v=+((st.version||'').split('-')[1]||0); if(v<4) throw new Error('Το Apps Script είναι παλιά έκδοση ('+(st.version||'?')+') — βάλε τον νέο κώδικα Code.gs και κάνε New version.');
+    const j=await Remote.get('tesla_history', from? {from: new Date(from+'T00:00:00').toISOString()} : {}); if(!j.ok) throw new Error(j.error||'Tesla'); tsBuild(j.sessions||[]); }
+  catch(e){ toast('Tesla: '+e.message, true); }
+  finally{ $('#tsCheck').disabled=false; $('#tsCheck').textContent='Έλεγχος στην Tesla'; }
+});
+function tsLocal(iso){ const m=/^(\d{4}-\d{2}-\d{2})T(\d{2}:\d{2})/.exec(iso||''); return m?{date:m[1],time:m[2]}:{date:null,time:null}; }   // τοπική ώρα του σταθμού, όπως στις εγγραφές
+const TS_FX_DEFAULT={EUR:1, CHF:0.93, CZK:24.3, GBP:0.86, NOK:11.6, SEK:11.2, DKK:7.46, PLN:4.25, HUF:390, RON:5.0, BGN:1.9558, RSD:117, TRY:40};
+function tsEur(s){ if(s.cost===0) return 0; const c=s.currency||'EUR'; if(c==='EUR') return s.cost; const fx={...TS_FX_DEFAULT,...(S.settings.fx||{})}[c]; return fx? Math.round(s.cost/fx*100)/100 : null; }
+function tsMin(t){ if(!t) return null; const [h,m]=t.split(':').map(Number); return h*60+m; }
+function tsBuild(sessions){
+  const all=compute(); const byRec=new Map(); const items=[];
+  const linked=new Map(); all.forEach(r=>String(r.tesla_id||'').split(',').filter(Boolean).forEach(id=>linked.set(id,r)));
+  const isSC=r=>r.location==='Tesla SuperCharger'||r.location==='Tesla SuperCharger Free'||r._d.cat==='supercharger';
+  const ss=sessions.map(s=>{ const st=tsLocal(s.start), en=tsLocal(s.stop); return {s, date:st.date, start:st.time, end:en.time, kwh:s.kwh, eur:tsEur(s), free:s.cost===0}; }).filter(x=>x.date&&x.kwh>0).sort((a,b)=>(a.date+a.start).localeCompare(b.date+b.start));
+  for(const x of ss){
+    let r=linked.get(x.s.id);
+    if(!r){ const t=tsMin(x.start); let best=null;
+      for(const c of all){ if(!isSC(c)||c.date!==x.date) continue; let sc;
+        if(c.start){ const cs=tsMin(c.start), ce=tsMin(c.end); const inside=ce!=null&&t>=cs-20&&t<=ce+5; const d=Math.abs(cs-t); if(d>20&&!inside) continue; sc=inside&&d>20?50:d; }
+        else { if(!isNum(c.kwh_charger)||Math.abs(c.kwh_charger-x.kwh)>Math.max(2,0.12*x.kwh)) continue; sc=100+Math.abs(c.kwh_charger-x.kwh); }
+        if(!best||sc<best[0]) best=[sc,c]; }
+      r=best&&best[1]; }
+    if(r){ if(!byRec.has(r.id)) byRec.set(r.id,{rec:r, xs:[]}); byRec.get(r.id).xs.push(x); }
+    else items.push({...x, action:x.eur==null?'fx':'new', selected:x.eur!=null, rec:null, xs:[x]});
+  }
+  for(const {rec,xs} of byRec.values()){
+    const kwh=Math.round(xs.reduce((a,x)=>a+x.kwh,0)*1000)/1000, eurs=xs.map(x=>x.eur), eur=eurs.includes(null)?null:Math.round(eurs.reduce((a,v)=>a+v,0)*100)/100, free=xs.every(x=>x.free);
+    const ids=xs.map(x=>x.s.id).join(',');
+    const foreign=xs.some(x=>!x.free&&x.s.currency&&x.s.currency!=='EUR'); const same=String(rec.tesla_id||'')===ids && isNum(rec.cost)&&(foreign||(eur!=null&&Math.abs(rec.cost-eur)<0.005)) && (rec.location==='Tesla SuperCharger Free')===free && isNum(rec.kwh_charger)&&Math.abs(rec.kwh_charger-kwh)<0.01;
+    items.push({s:{site:xs.map(x=>x.s.site)[0], id:ids, currency:xs.map(x=>x.s.currency).find(c=>c&&c!=='EUR')||'EUR', cost:xs.reduce((a,x)=>a+x.s.cost,0)}, date:xs[0].date, start:xs[0].start, end:xs[xs.length-1].end, kwh, eur, free, rec, xs,
+      action: same?'exists':(eur==null?'fx':'update'), selected: !same && eur!=null && !(isNum(rec.kwh_charger)&&rec.kwh_charger>0&&Math.abs(kwh-rec.kwh_charger)/rec.kwh_charger>0.15), big: isNum(rec.kwh_charger)&&rec.kwh_charger>0&&Math.abs(kwh-rec.kwh_charger)/rec.kwh_charger>0.15});
+  }
+  items.sort((a,b)=>(a.date+(a.start||'')).localeCompare(b.date+(b.start||'')));
+  tsState={items}; tsRender();
+}
+function tsRender(){
+  const p=$('#teslaPanel'); if(!tsState){ p.style.display='none'; return; } p.style.display='block';
+  const it=tsState.items, n=k=>it.filter(i=>i.action===k).length;
+  $('#tsStats').textContent=`${it.length} φορτίσεις Supercharger · ${n('update')} διορθώσεις από την Tesla · ${n('new')} νέες · ${n('exists')} ίδιες ήδη`+(n('fx')?` · ${n('fx')} σε ξένο νόμισμα χωρίς ισοτιμία`:'');
+  const lab={update:'<span class="pill ok">διόρθωση</span>',new:'<span class="pill ok">νέα</span>',exists:'<span class="pill dup">ίδια</span>',fx:'<span class="pill dup" title="Βάλε ισοτιμία στις ρυθμίσεις">νόμισμα;</span>'};
+  const euro=i=>i.free?'<span class="faint">δωρεάν</span>':(i.eur==null?esc(fmt(i.s.cost,2)+' '+i.s.currency):fmt(i.eur,2)+(i.s.currency&&i.s.currency!=='EUR'?` <span class="faint">(${fmt(i.s.cost,2)} ${esc(i.s.currency)})</span>`:''));
+  $('#tsTable').innerHTML=`<thead><tr><th class="l"></th><th class="l">Ημερομηνία</th><th class="l">Supercharger (Tesla)</th><th>kWh</th><th>€ Tesla</th><th class="l">Πρόταση</th><th class="l">Τώρα στην εφαρμογή</th></tr></thead><tbody>`+
+    it.map((i,k)=>`<tr class="${i.selected?'':'flag'}"><td class="l">${(i.action==='update'||i.action==='new')?`<input type="checkbox" data-k="${k}" ${i.selected?'checked':''}>`:''}</td><td class="l">${fmtDate(i.date)} <span class="faint">${i.start||''}</span></td><td class="l">${esc(i.s.site)}${i.xs.length>1?` <span class="faint">(${i.xs.length} συνεδρίες)</span>`:''}</td><td>${fmt(i.kwh,2)}</td><td>${euro(i)}</td><td class="l">${lab[i.action]}${i.big?' <span class="pill dup" title="Τα kWh διαφέρουν πάνω από 15% — έλεγξέ το πριν το τσεκάρεις">kWh ≠</span>':''}</td><td class="l">${i.rec?`${esc(i.rec.location)} ${i.rec.start||''} · ${fmt(i.rec.kwh_charger,2)} kWh · ${isNum(i.rec.cost)?(i.rec.flags?.includes('cost_estimated')?'≈ ':'')+fmt(i.rec.cost,2)+' €':'–'}`:''}</td></tr>`).join('')+`</tbody>`;
+  $$('#tsTable input[type=checkbox]').forEach(cb=>cb.addEventListener('change',()=>{ tsState.items[+cb.dataset.k].selected=cb.checked; }));
+}
+function tsNote(r,t){ if(!(r.note||'').includes(t)) r.note=((r.note||'')+'; '+t).replace(/^; /,''); }
+$('#tsClose').addEventListener('click',()=>{ tsState=null; tsRender(); });
+$('#tsApply').addEventListener('click',()=>{ if(!tsState) return; if(!requireOnline()) return; const sel=tsState.items.filter(i=>i.selected); if(!sel.length){ toast('Δεν έχεις επιλέξει τίποτα.', true); return; }
+  ensureFreeLoc(); let nc=0, nn=0;
+  for(const i of sel){
+    if(i.action==='update'){ const r=S.records.find(x=>x.id===i.rec.id); if(!r) continue;
+      if(!isNum(r.kwh_charger)||Math.abs(r.kwh_charger-i.kwh)>0.005){ tsNote(r, isNum(r.kwh_charger)?`kWh φορτιστή ${fmt(r.kwh_charger,2)} → ${fmt(i.kwh,3)} (Tesla)`:'kWh από την Tesla'); r.kwh_charger=i.kwh; }
+      if(i.s.currency&&i.s.currency!=='EUR'&&!i.free) tsNote(r, `Tesla: ${fmt(i.s.cost,2)} ${i.s.currency} → ${fmt(i.eur,2)} €`);
+      r.cost=i.eur; r.price=i.kwh>0?Math.round(i.eur/i.kwh*10000)/10000:null; r.tesla_id=i.s.id; r.current='DC';
+      r.flags=(r.flags||[]).filter(f=>f!=='cost_estimated'&&f!=='free_credit'&&f!=='cost_confirmed'); r.flags.push('cost_confirmed');
+      if(i.free){ r.flags.push('free_credit'); r.location='Tesla SuperCharger Free'; } else r.location='Tesla SuperCharger';
+      nc++; }
+    if(i.action==='new'){ const r={id:uid(), date:i.date, start:i.start, end:i.end, duration_min:null, location: i.free?'Tesla SuperCharger Free':'Tesla SuperCharger', pct_start:null, pct_end:null, kwh_charger:i.kwh, kwh_car:null, current:'DC', cost:i.eur, price:i.kwh>0?Math.round(i.eur/i.kwh*10000)/10000:null, odometer:null, tariff:null, note:i.s.site+' — από την Tesla', source:'tesla', teslafi_id:null, tesla_id:i.s.id, flags:['cost_confirmed','incomplete'].concat(i.free?['free_credit']:[])};
+      if(r.start&&r.end){ let m=tsMin(r.end)-tsMin(r.start); if(m<0) m+=1440; r.duration_min=m; }
+      r.seq=seq++; S.records.push(r); nn++; } }
+  save(); toast(`Tesla: ${nc} εγγραφές διορθώθηκαν, ${nn} νέες φορτίσεις`); tsState=null; tsRender(); render(); });
+
+
+/* ===================== live from Tesla ===================== */
+let tlLast=null;
+function tlShow(){ const box=$('#tlive'); if(!box) return; box.style.display=Remote.cfg()?'block':'none'; if(!box.dataset.wired){ box.dataset.wired='1';
+  $('#tlNow').addEventListener('click',()=>tlRun(async()=>{ await tlFetch(); }));
+  $('#tlStart').addEventListener('click',()=>tlRun(tlStart));
+  $('#tlEnd').addEventListener('click',()=>tlRun(tlEnd)); }
+  if(!tlLast) tlCard(null); }
+async function tlRun(fn){ const bs=$$('#tlive button'); bs.forEach(b=>b.disabled=true); try{ await fn(); }catch(e){ $('#tlCard').innerHTML=`<span style="color:#B3261E">${esc(e.message)}</span>`+tlPendingHTML(); } finally{ bs.forEach(b=>b.disabled=false); } }
+function tlNowHM(){ const d=new Date(); return `${pad(d.getHours())}:${pad(d.getMinutes())}`; }
+function tlPendingHTML(){ const p=S.settings.tesla_pending; if(!p) return ''; return `<div style="margin-top:6px">Σε εξέλιξη: έναρξη <b>${fmtDate(p.date)} ${esc(p.time||'')}</b> · <b>${fmt(p.pct,0)}%</b>${p.loc?` · ${esc(p.loc)}`:''} <a href="#" id="tlCancel" class="muted">ακύρωση</a></div>`; }
+function tlCard(j){ const el=$('#tlCard'); if(!el) return;
+  let h='';
+  if(j){ const st={Charging:'Φορτίζει',Complete:'Ολοκληρώθηκε',Stopped:'Σταμάτησε',Disconnected:'Χωρίς καλώδιο',NoPower:'Χωρίς ρεύμα',Starting:'Ξεκινά'}[j.charging]||j.charging||'';
+    const parts=[`<b>${esc(st)}</b>`, `μπαταρία <b>${fmt(j.battery,0)}%</b>${isNum(j.limit)?` → όριο ${fmt(j.limit,0)}%`:''}`];
+    if(j.charging==='Charging'){ parts.push(`<b>${fmt(j.power_kw,1)} kW</b>${j.fast?' DC':` AC · ${fmt(j.amps,0)} A × ${fmt(j.volts,0)} V${j.phases?` · ${j.phases}φ`:''}`}`); if(isNum(j.minutes_to_full)&&j.minutes_to_full>0) parts.push(`ακόμη ${Math.floor(j.minutes_to_full/60)} ώ ${pad(j.minutes_to_full%60)}′`); }
+    if(isNum(j.energy_added)) parts.push(`+${fmt(j.energy_added,2)} kWh σε αυτή τη φόρτιση`);
+    if(isNum(j.odometer_km)) parts.push(`${fmtInt(j.odometer_km)} km`); if(isNum(j.range_km)) parts.push(`αυτονομία ${fmtInt(j.range_km)} km`);
+    if(isNum(j.outside)) parts.push(`έξω ${fmt(j.outside,0)}°C`);
+    const loc=tlLoc(j); if(loc) parts.push(`📍 ${esc(loc)}`); else if(isNum(j.lat)) parts.push(`📍 νέο σημείο — διάλεξε τοποθεσία, θα τη θυμάται`);
+    h=parts.join(' · ')+`<div class="faint">ενημέρωση ${tlNowHM()}</div>`; }
+  else h=`<span class="faint">Μπαταρία, φόρτιση και κοντέρ κατευθείαν από το αυτοκίνητο.</span>`;
+  el.innerHTML=h+tlPendingHTML();
+  const c=$('#tlCancel'); if(c) c.addEventListener('click',ev=>{ ev.preventDefault(); delete S.settings.tesla_pending; save(); tlCard(tlLast); }); }
+async function tlFetch(){ $('#tlCard').innerHTML='Ρωτάω την Tesla… <span class="faint">(αν το αυτοκίνητο κοιμάται, το ξυπνάω — έως 30″)</span>';
+  const j=await Remote.get('tesla_live',{wake:'1'}); if(j.state!=='online') throw new Error('Το αυτοκίνητο δεν απαντά ('+(j.state||'?')+') — κοιμάται βαθιά ή δεν έχει σήμα. Δοκίμασε ξανά σε λίγο.');
+  tlLast=j; tlCard(j); return j; }
+function tlDist(a,b,c,d){ const R=6371e3, r=x=>x*Math.PI/180; const dl=r(c-a), dn=r(d-b); const h=Math.sin(dl/2)**2+Math.cos(r(a))*Math.cos(r(c))*Math.sin(dn/2)**2; return 2*R*Math.asin(Math.sqrt(h)); }
+function tlLoc(j){ if(j.fast && /tesla|supercharg/i.test((j.fast_brand||'')+' '+(j.fast_type||''))) return 'Tesla SuperCharger';
+  if(!isNum(j.lat)||!isNum(j.lon)) return null; const m=S.settings.loc_coords||{}; let best=null;
+  for(const [name,pts] of Object.entries(m)){ for(const q of (Array.isArray(pts[0])?pts:[pts])){ const dd=tlDist(j.lat,j.lon,q[0],q[1]); if(dd<=250&&(!best||dd<best[0])) best=[dd,name]; } }
+  return best&&locOf(best[1])?best[1]:null; }
+function tlEff(loc, dc){ const rs=S.records.filter(r=>r.location===loc&&isNum(r.kwh_car)&&isNum(r.kwh_charger)&&r.kwh_charger>1&&r.kwh_car<=r.kwh_charger*1.02).map(r=>r.kwh_car/r.kwh_charger).sort((a,b)=>a-b);
+  if(rs.length>=3) return rs[Math.floor(rs.length/2)]; return dc?0.96:0.9; }
+function tlSetLoc(loc){ if(!loc||!locOf(loc)) return; $('#e_loc').value=loc; $('#e_loc').dispatchEvent(new Event('change')); }
+async function tlStart(){ if(!requireOnline()) return; const j=await tlFetch();
+  const p={date:todayISO(), time:tlNowHM(), pct:j.battery, odo:j.odometer_km, lat:j.lat, lon:j.lon, loc:tlLoc(j)||$('#e_loc').value||'', dc:!!j.fast};
+  S.settings.tesla_pending=p; save(); tlFill(p,null); tlCard(j); toast('Έναρξη γράφτηκε — όταν τελειώσει, πάτα «Τέλος από Tesla»'); }
+async function tlEnd(){ const j=await tlFetch(); const p=S.settings.tesla_pending||null; tlFill(p,j); toast(p?'Συμπληρώθηκε — έλεγξε και πάτα Αποθήκευση':'Δεν υπήρχε «Έναρξη» — συμπλήρωσε % αρχής και ώρα έναρξης'); }
+function tlFill(p,j){ const g=id=>$('#e_'+id);
+  g('date').value=(p&&p.date)||todayISO(); if(p&&p.time) g('start').value=p.time; if(p&&isNum(p.pct)) g('p0').value=String(p.pct);
+  const loc=(j&&tlLoc(j))||(p&&p.loc)||''; tlSetLoc(loc);
+  const dc=j?!!j.fast:!!(p&&p.dc); setSeg('e_cur', dc?'DC':'AC');
+  if(j){ g('end').value=tlNowHM(); if(isNum(j.battery)) g('p1').value=String(j.battery); if(isNum(j.odometer_km)) g('odo').value=String(j.odometer_km);
+    if(isNum(j.energy_added)&&j.energy_added>0){ g('kwhc').value=String(j.energy_added); g('kwhc').dataset.auto='0';
+      if(!g('kwh').value){ const e=tlEff(g('loc').value, dc); g('kwh').value=String(Math.round(j.energy_added/e*100)/100); g('kwh').dataset.est='1'; g('effHint').textContent=`Kwh real = εκτίμηση (απόδοση ${fmt(e*100,0)}%) — άλλαξέ το αν ξέρεις τον μετρητή`; } } }
+  else if(p&&isNum(p.odo)) g('odo').value=String(p.odo);
+  $('#entryForm').dataset.tesla='1'; applyLocPrice('e_'); recalcCost('e_'); if(!g('effHint').textContent) hintEff('e_'); }
+function tlAfterSave(r){ const p=S.settings.tesla_pending; if(p&&p.date===r.date) delete S.settings.tesla_pending;
+  const src=(tlLast&&isNum(tlLast.lat))?[tlLast.lat,tlLast.lon]:(p&&isNum(p.lat)?[p.lat,p.lon]:null);
+  if(src&&r.location&&!/SuperCharger/i.test(r.location)){ const m=S.settings.loc_coords||(S.settings.loc_coords={}); const pts=m[r.location]?(Array.isArray(m[r.location][0])?m[r.location]:[m[r.location]]):[];
+    if(!pts.some(q=>tlDist(src[0],src[1],q[0],q[1])<150)) pts.push([Math.round(src[0]*1e5)/1e5, Math.round(src[1]*1e5)/1e5]); m[r.location]=pts; }
+  tlLast=null; save(); }
 
 /* ===================== price periods ===================== */
 let priceLoc=null;
@@ -1064,7 +1211,7 @@ const drop=$('#dropTeslafi'); drop.addEventListener('dragover',e=>{e.preventDefa
 drop.addEventListener('drop',e=>{ e.preventDefault(); drop.classList.remove('over'); const f=e.dataTransfer.files[0]; if(f) handleTeslafiFile(f); });
 $('input', drop).addEventListener('change',e=>{ const f=e.target.files[0]; if(f) handleTeslafiFile(f); e.target.value=''; });
 function teslafiLastInfo(){ const rs=S.records.filter(r=>r.teslafi_id!=null); if(!rs.length) return ''; const m=rs.reduce((a,b)=>(b.teslafi_id>a.teslafi_id?b:a)); return `Τελευταία φόρτιση από TeslaFi: <b>#${esc(m.teslafi_id)}</b> (${fmtDate(m.date)}). Στο TeslaFi κατέβασε τις φορτίσεις από <b>${fmtDate(m.date)}</b> και μετά — ό,τι υπάρχει ήδη θα παραλειφθεί.`; }
-function renderImportInfo(){ $('#tfLast').innerHTML=teslafiLastInfo(); if(ciState) renderCostImport(); $('#storageInfo').innerHTML = Store.mode==='server' ? `Αρχείο δεδομένων: <code>${esc(Store.info.data_file||'')}</code><br>Αντίγραφα: <code>${esc(Store.info.backup_dir||'')}</code> (κρατούνται τα ${Store.info.backups_keep||''} πιο πρόσφατα)` : 'Τα δεδομένα αποθηκεύονται στον browser αυτής της συσκευής.'; if(importState) renderImport(); }
+function renderImportInfo(){ tsRefreshState(); if(tsState) tsRender(); $('#tfLast').innerHTML=teslafiLastInfo(); if(ciState) renderCostImport(); $('#storageInfo').innerHTML = Store.mode==='server' ? `Αρχείο δεδομένων: <code>${esc(Store.info.data_file||'')}</code><br>Αντίγραφα: <code>${esc(Store.info.backup_dir||'')}</code> (κρατούνται τα ${Store.info.backups_keep||''} πιο πρόσφατα)` : 'Τα δεδομένα αποθηκεύονται στον browser αυτής της συσκευής.'; if(importState) renderImport(); }
 function renderImport(){
   const p=$('#importPanel'); if(!importState){ p.style.display='none'; return; } p.style.display='block';
   const items=importState.items; $('#importTitle').textContent=`Προεπισκόπηση — ${importState.name}`;
